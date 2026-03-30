@@ -35,6 +35,7 @@ builder.Services.AddScoped<IGrokAiService>(sp =>
         sp.GetRequiredService<ILogger<GrokAiService>>()));
 builder.Services.AddScoped<IFileProcessingService, FileProcessingService>();
 builder.Services.AddScoped<ICurriculumAnalysisService, CurriculumAnalysisService>();
+builder.Services.AddScoped<IAnalysisService, AnalysisService>();
 
 var app = builder.Build();
 

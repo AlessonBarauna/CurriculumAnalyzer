@@ -1,9 +1,17 @@
 using CurriculumAnalyzer.API.Models;
-using CurriculumAnalyzer.API.Models.Dto;
 
 namespace CurriculumAnalyzer.API.Services;
 
 public interface ICurriculumAnalysisService
 {
-    Task<AnalysisResponseDto> AnalyzeCurriculumAsync(string curriculumId, string curriculumText, UserContextModel userContext);
+    /// <summary>
+    /// Orquestra o fluxo completo: extração de texto → cache → análise AI → persistência.
+    /// Retorna o ID da análise (nova ou cacheada).
+    /// </summary>
+    Task<string> ProcessUploadAsync(
+        Stream fileStream,
+        string fileName,
+        string fileExtension,
+        long fileSize,
+        UserContextModel userContext);
 }
