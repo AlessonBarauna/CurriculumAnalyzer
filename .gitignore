@@ -1,0 +1,19 @@
+# .NET
+**/bin/
+**/obj/
+**/*.user
+**/*.suo
+.vs/
+*.db
+*.db-shm
+*.db-wal
+**/appsettings.Development.json
+
+# Angular
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Misc
+.DS_Store
+Thumbs.db

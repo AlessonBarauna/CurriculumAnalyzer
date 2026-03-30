@@ -1,0 +1,177 @@
+<div *ngIf="loading" class="loading-overlay">
+  <div class="loading-box">
+    <div class="spinner-large"></div>
+    <p>Carregando análise...</p>
+  </div>
+</div>
+
+<div *ngIf="errorMessage" class="error-page">
+  <p>{{ errorMessage }}</p>
+  <button (click)="analyzeAnother()">Voltar</button>
+</div>
+
+<div *ngIf="!loading && !errorMessage && analysis" class="report-page">
+
+  <!-- HEADER -->
+  <div class="report-header">
+    <div class="header-content">
+      <h1>📊 Análise de Currículo</h1>
+      <div class="score-badge" [style.background]="getScoreColor(analysis.overallScore)">
+        <span class="score-number">{{ analysis.overallScore }}</span>
+        <span class="score-max">/100</span>
+        <span class="score-label">{{ getScoreLabel(analysis.overallScore) }}</span>
+      </div>
+    </div>
+    <p class="score-explanation">{{ analysis.scoreExplanation }}</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-bar">
+    <button (click)="activeTab = 'overview'" [class.active]="activeTab === 'overview'">📋 Visão Geral</button>
+    <button (click)="activeTab = 'strengths'" [class.active]="activeTab === 'strengths'">✅ Pontos Fortes</button>
+    <button (click)="activeTab = 'weaknesses'" [class.active]="activeTab === 'weaknesses'">⚠️ Melhorias</button>
+    <button (click)="activeTab = 'plan'" [class.active]="activeTab === 'plan'">🎯 Plano de Ação</button>
+    <button (click)="activeTab = 'jobs'" [class.active]="activeTab === 'jobs'">💼 Vagas</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="tab-content">
+
+    <!-- OVERVIEW -->
+    <div *ngIf="activeTab === 'overview'">
+      <div class="salary-card">
+        <h3>💰 Estimativa Salarial</h3>
+        <p class="salary-range">
+          R$ {{ analysis.estimatedSalaryRange.min | number:'1.0-0' }} –
+          R$ {{ analysis.estimatedSalaryRange.max | number:'1.0-0' }}
+        </p>
+      </div>
+
+      <h3 class="section-title">Scores por Seção</h3>
+      <div class="section-scores">
+        <div class="section-row" *ngFor="let section of getSectionEntries()">
+          <span class="section-name">{{ getSectionLabel(section.key) }}</span>
+          <div class="progress-bar">
+            <div class="progress-fill"
+              [style.width.%]="section.value.score"
+              [style.background]="getScoreColor(section.value.score)">
+            </div>
+          </div>
+          <span class="section-score">{{ section.value.score }}/100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRENGTHS -->
+    <div *ngIf="activeTab === 'strengths'">
+      <h2>✅ O que está funcionando bem</h2>
+      <div class="card-list">
+        <div class="feedback-card strength" *ngFor="let item of analysis.strengths">
+          <div class="card-priority" [ngClass]="'p-' + item.priority">{{ item.priority }}</div>
+          <h4>{{ item.title }}</h4>
+          <p>{{ item.description }}</p>
+          <p class="impact">💡 {{ item.impact }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEAKNESSES -->
+    <div *ngIf="activeTab === 'weaknesses'">
+      <h2>⚠️ Pontos que Precisam de Atenção</h2>
+      <div class="card-list">
+        <div class="feedback-card weakness" *ngFor="let item of analysis.weaknesses" [ngClass]="'p-' + item.priority">
+          <div class="card-priority" [ngClass]="'p-' + item.priority">{{ item.priority }}</div>
+          <h4>{{ item.title }}</h4>
+          <p><strong>Problema:</strong> {{ item.description }}</p>
+          <p><strong>Impacto:</strong> {{ item.impact }}</p>
+          <div *ngIf="item.example" class="example-box">
+            <p class="bad">❌ {{ item.example.bad }}</p>
+            <p class="good">✅ {{ item.example.good }}</p>
+          </div>
+          <div *ngIf="item.solutionSteps && item.solutionSteps.length" class="solution-steps">
+            <strong>Como corrigir:</strong>
+            <ol>
+              <li *ngFor="let step of item.solutionSteps">{{ step }}</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTION PLAN -->
+    <div *ngIf="activeTab === 'plan'">
+      <h2>🎯 Plano de Ação Personalizado</h2>
+
+      <div class="timeline-phases">
+        <div class="phase" *ngFor="let phase of [
+          {key: 'short-term', label: '⚡ Curto Prazo (2-4 semanas)'},
+          {key: 'medium-term', label: '📅 Médio Prazo (1-3 meses)'},
+          {key: 'long-term', label: '🎓 Longo Prazo (3-6 meses)'}
+        ]">
+          <h3>{{ phase.label }}</h3>
+          <div *ngIf="getActionPlanByTimeline(phase.key).length === 0" class="empty-phase">
+            Nenhuma ação para este período.
+          </div>
+          <div class="action-item" *ngFor="let item of getActionPlanByTimeline(phase.key)">
+            <div class="action-header">
+              <span class="action-priority" [ngClass]="'p-' + item.priority">{{ item.priority }}</span>
+              <span class="action-duration">⏱️ {{ item.estimatedDuration }}</span>
+            </div>
+            <h4>{{ item.title }}</h4>
+            <p>{{ item.description }}</p>
+            <ul class="checklist">
+              <li *ngFor="let check of item.checklist">
+                <input type="checkbox"> {{ check }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-title">🌟 Oportunidades com Alto ROI</h3>
+      <div class="opportunities-grid">
+        <div class="opportunity-card" *ngFor="let opp of analysis.opportunities">
+          <h4>{{ opp.title }}</h4>
+          <p>{{ opp.description }}</p>
+          <div class="opp-meta">
+            <span>⏱️ {{ opp.timelineWeeks }} sem.</span>
+            <span>💰 +R$ {{ opp.estimatedSalaryImpact | number:'1.0-0' }}</span>
+            <span class="difficulty" [ngClass]="'diff-' + opp.difficulty">{{ opp.difficulty }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOBS -->
+    <div *ngIf="activeTab === 'jobs'">
+      <h2>💼 Recomendações por Tipo de Vaga</h2>
+      <div class="jobs-grid">
+        <div class="job-card" *ngFor="let job of analysis.jobRecommendations">
+          <div class="job-header">
+            <h3>{{ getJobTypeLabel(job.type) }}</h3>
+            <span class="fit-badge" [ngClass]="'fit-' + job.fit">{{ job.fit }}</span>
+          </div>
+          <div class="job-section">
+            <h4>✅ Suas forças</h4>
+            <ul><li *ngFor="let s of job.strengths">{{ s }}</li></ul>
+          </div>
+          <div class="job-section">
+            <h4>⚠️ Melhorar</h4>
+            <ul><li *ngFor="let i of job.improvements">{{ i }}</li></ul>
+          </div>
+          <div class="job-section">
+            <h4>🎯 Preparação</h4>
+            <ul><li *ngFor="let t of job.preparationTips">{{ t }}</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="action-buttons">
+    <button class="btn-secondary" (click)="analyzeAnother()">🔄 Analisar Outro Currículo</button>
+  </div>
+
+</div>

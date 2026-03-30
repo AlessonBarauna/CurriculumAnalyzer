@@ -1,0 +1,68 @@
+<div class="upload-page">
+  <div class="upload-container">
+    <div class="header">
+      <h1>🎯 Analisador de Currículo</h1>
+      <p>Análise profissional com IA para profissionais de TI</p>
+    </div>
+
+    <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()" class="upload-form">
+
+      <div class="section">
+        <h3>1. Envie seu currículo</h3>
+        <div class="file-drop-zone" [class.has-file]="selectedFile">
+          <input type="file" id="fileInput" accept=".pdf,.docx,.txt" (change)="onFileSelected($event)" hidden>
+          <label for="fileInput" class="file-label">
+            <span class="icon">📄</span>
+            <span *ngIf="!selectedFile">Clique para selecionar PDF, DOCX ou TXT (máx. 5MB)</span>
+            <span *ngIf="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>2. Seu contexto profissional</h3>
+
+        <div class="form-group">
+          <label>Nível de experiência</label>
+          <select formControlName="experienceLevel">
+            <option *ngFor="let opt of levelOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Especialização</label>
+          <select formControlName="specialization">
+            <option *ngFor="let opt of specializationOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Objetivo no mercado</label>
+          <input type="text" formControlName="marketObjective"
+            placeholder="Ex: Conseguir primeiro emprego como dev backend, transição de carreira...">
+        </div>
+
+        <div class="form-group">
+          <label>Localização atual</label>
+          <input type="text" formControlName="currentLocation" placeholder="Ex: Brasil, São Paulo...">
+        </div>
+
+        <div class="form-group">
+          <label>Pretensão salarial (opcional)</label>
+          <input type="number" formControlName="targetSalary" placeholder="Ex: 8000">
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        ⚠️ {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn-analyze" [disabled]="loading || !selectedFile">
+        <span *ngIf="!loading">🚀 Analisar Currículo</span>
+        <span *ngIf="loading" class="loading-text">
+          <span class="spinner"></span> Analisando com IA...
+        </span>
+      </button>
+    </form>
+  </div>
+</div>
