@@ -14,13 +14,13 @@ namespace CurriculumAnalyzer.API.Controllers;
 [Route("api/curriculum")]
 public class CurriculumController : ControllerBase
 {
-    private readonly CurriculumAnalysisService _analysisService;
-    private readonly FileProcessingService _fileService;
+    private readonly ICurriculumAnalysisService _analysisService;
+    private readonly IFileProcessingService _fileService;
     private readonly AppDbContext _dbContext;
 
     public CurriculumController(
-        CurriculumAnalysisService analysisService,
-        FileProcessingService fileService,
+        ICurriculumAnalysisService analysisService,
+        IFileProcessingService fileService,
         AppDbContext dbContext)
     {
         _analysisService = analysisService;

@@ -28,13 +28,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
 
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<GrokAiService>(sp =>
+builder.Services.AddScoped<IGrokAiService>(sp =>
     new GrokAiService(
         sp.GetRequiredService<IHttpClientFactory>().CreateClient(),
         sp.GetRequiredService<IConfiguration>(),
         sp.GetRequiredService<ILogger<GrokAiService>>()));
-builder.Services.AddScoped<FileProcessingService>();
-builder.Services.AddScoped<CurriculumAnalysisService>();
+builder.Services.AddScoped<IFileProcessingService, FileProcessingService>();
+builder.Services.AddScoped<ICurriculumAnalysisService, CurriculumAnalysisService>();
 
 var app = builder.Build();
 

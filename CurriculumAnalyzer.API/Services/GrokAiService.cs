@@ -7,7 +7,7 @@ using CurriculumAnalyzer.API.Models.Dto;
 
 namespace CurriculumAnalyzer.API.Services;
 
-public class GrokAiService
+public class GrokAiService : IGrokAiService
 {
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;

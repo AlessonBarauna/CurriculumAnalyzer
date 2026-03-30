@@ -7,7 +7,7 @@ using iText.Kernel.Pdf.Canvas.Parser.Listener;
 
 namespace CurriculumAnalyzer.API.Services;
 
-public class FileProcessingService
+public class FileProcessingService : IFileProcessingService
 {
     public async Task<string> ExtractTextAsync(Stream fileStream, string fileType)
     {

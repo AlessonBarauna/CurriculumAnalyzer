@@ -6,12 +6,12 @@ using CurriculumAnalyzer.API.Models.Dto;
 
 namespace CurriculumAnalyzer.API.Services;
 
-public class CurriculumAnalysisService
+public class CurriculumAnalysisService : ICurriculumAnalysisService
 {
-    private readonly GrokAiService _grokService;
+    private readonly IGrokAiService _grokService;
     private readonly AppDbContext _dbContext;
 
-    public CurriculumAnalysisService(GrokAiService grokService, AppDbContext dbContext)
+    public CurriculumAnalysisService(IGrokAiService grokService, AppDbContext dbContext)
     {
         _grokService = grokService;
         _dbContext = dbContext;
