@@ -14,5 +14,6 @@ public class CurriculumEntity
     public string MarketObjective { get; set; } = string.Empty;
     public decimal? TargetSalary { get; set; }
     public string CurrentLocation { get; set; } = string.Empty;
+    public string ContentHash { get; set; } = string.Empty;
     public ICollection<AnalysisEntity> Analyses { get; set; } = new List<AnalysisEntity>();
 }

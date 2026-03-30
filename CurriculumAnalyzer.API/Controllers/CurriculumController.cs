@@ -1,9 +1,12 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using CurriculumAnalyzer.API.Data;
 using CurriculumAnalyzer.API.Data.Entities;
 using CurriculumAnalyzer.API.Models;
 using CurriculumAnalyzer.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurriculumAnalyzer.API.Controllers;
 
@@ -69,6 +72,15 @@ public class CurriculumController : ControllerBase
         if (string.IsNullOrWhiteSpace(extractedText))
             return BadRequest(new { error = "Não foi possível extrair texto do arquivo." });
 
+        var contentHash = ComputeHash(extractedText, userContext);
+
+        var existing = await _dbContext.Curriculums
+            .Include(c => c.Analyses)
+            .FirstOrDefaultAsync(c => c.ContentHash == contentHash);
+
+        if (existing?.Analyses.Count > 0)
+            return Ok(new { analysisId = existing.Analyses.First().Id });
+
         var curriculum = new CurriculumEntity
         {
             FileName = file.FileName,
@@ -80,7 +92,8 @@ public class CurriculumController : ControllerBase
             Specialization = userContext.Specialization,
             MarketObjective = userContext.MarketObjective,
             TargetSalary = userContext.TargetSalary,
-            CurrentLocation = userContext.CurrentLocation
+            CurrentLocation = userContext.CurrentLocation,
+            ContentHash = contentHash
         };
 
         _dbContext.Curriculums.Add(curriculum);
@@ -89,5 +102,12 @@ public class CurriculumController : ControllerBase
         var analysis = await _analysisService.AnalyzeCurriculumAsync(curriculum.Id, extractedText, userContext);
 
         return Ok(new { analysisId = analysis.Id });
+    }
+
+    private static string ComputeHash(string text, UserContextModel ctx)
+    {
+        var input = $"{text}|{ctx.ExperienceLevel}|{ctx.Specialization}|{ctx.MarketObjective}|{ctx.CurrentLocation}";
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
+        return Convert.ToHexString(bytes);
     }
 }
