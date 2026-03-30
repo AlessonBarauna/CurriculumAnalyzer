@@ -84,6 +84,10 @@ namespace CurriculumAnalyzer.API.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CurrentLocation")
                         .IsRequired()
                         .HasColumnType("TEXT");

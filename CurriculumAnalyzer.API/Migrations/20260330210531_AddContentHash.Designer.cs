@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CurriculumAnalyzer.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260330210048_AddContentHash")]
+    [Migration("20260330210531_AddContentHash")]
     partial class AddContentHash
     {
         /// <inheritdoc />
@@ -85,6 +85,10 @@ namespace CurriculumAnalyzer.API.Migrations
             modelBuilder.Entity("CurriculumAnalyzer.API.Data.Entities.CurriculumEntity", b =>
                 {
                     b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CurrentLocation")
