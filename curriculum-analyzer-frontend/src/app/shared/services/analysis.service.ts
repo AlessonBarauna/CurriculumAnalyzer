@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CurriculumAnalysis } from '../models/analysis.model';
-import { environment } from '../../../environments/environment';
+import { ApiConfigService } from './api-config.service';
 
 @Injectable({ providedIn: 'root' })
 export class AnalysisService {
-  private apiUrl = environment.apiUrl;
+  constructor(private http: HttpClient, private config: ApiConfigService) {}
 
-  constructor(private http: HttpClient) {}
+  private get apiUrl() { return this.config.apiUrl; }
 
   getAnalysis(id: string): Observable<CurriculumAnalysis> {
     return this.http.get<CurriculumAnalysis>(`${this.apiUrl}/analysis/${id}`);
