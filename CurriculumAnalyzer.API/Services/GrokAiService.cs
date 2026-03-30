@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CurriculumAnalyzer.API.Exceptions;
 using CurriculumAnalyzer.API.Models;
 using CurriculumAnalyzer.API.Models.Dto;
 
@@ -24,7 +25,7 @@ public class GrokAiService
     {
         var apiKey = _configuration["Groq:ApiKey"];
         if (string.IsNullOrEmpty(apiKey) || apiKey == "CONFIGURE_VIA_ENV")
-            throw new InvalidOperationException("Groq API key not configured. Set Groq:ApiKey in appsettings.");
+            throw new GrokApiException("Groq API key não configurada. Defina Groq:ApiKey no appsettings.");
 
         var prompt = BuildAnalysisPrompt(curriculumText, userContext);
 
@@ -49,14 +50,14 @@ public class GrokAiService
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError("Grok API error {Status}: {Body}", response.StatusCode, responseContent);
-            throw new Exception($"Grok API error {response.StatusCode}: {responseContent}");
+            throw new GrokApiException($"Groq retornou erro {(int)response.StatusCode}. Tente novamente.");
         }
 
         var grokResponse = JsonSerializer.Deserialize<GrokApiResponse>(responseContent,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         var content = grokResponse?.Choices?[0]?.Message?.Content
-            ?? throw new Exception("Empty response from Grok API");
+            ?? throw new GrokApiException("Resposta vazia recebida da API Groq.");
 
         return ParseGrokResponse(content);
     }
@@ -130,7 +131,7 @@ RETORNE APENAS UM JSON VÁLIDO (sem markdown, sem texto antes ou depois):
         };
 
         var result = JsonSerializer.Deserialize<AnalysisResponseDto>(jsonText, options)
-            ?? throw new Exception("Failed to deserialize Grok response");
+            ?? throw new GrokApiException("Não foi possível interpretar a resposta da API Groq.");
 
         result.RawResponse = responseText;
         return result;

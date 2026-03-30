@@ -13,6 +13,9 @@ Ao receber um pedido de melhoria:
 2. Execute as tarefas uma a uma, explicando cada mudança (postura de professor acima).
 3. Ao concluir **cada tarefa**, faça um commit com mensagem descritiva e dê **push** para o repositório remoto (`git push`).
 
+### Commits
+Nunca incluir `Co-Authored-By: Claude` ou qualquer referência ao assistente nas mensagens de commit.
+
 ### Plano de alteração
 Sempre que o usuário pedir para "seguir com melhorias", "continuar", "próxima feature" ou similar, **primeiro apresente o plano** (lista numerada) e aguarde confirmação antes de executar. Só pule essa etapa se o usuário disser explicitamente para começar sem plano.
 

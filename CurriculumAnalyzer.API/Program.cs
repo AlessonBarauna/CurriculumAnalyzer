@@ -1,9 +1,12 @@
 using CurriculumAnalyzer.API.Data;
+using CurriculumAnalyzer.API.Middleware;
 using CurriculumAnalyzer.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -35,6 +38,7 @@ builder.Services.AddScoped<CurriculumAnalysisService>();
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("AllowAngular");
