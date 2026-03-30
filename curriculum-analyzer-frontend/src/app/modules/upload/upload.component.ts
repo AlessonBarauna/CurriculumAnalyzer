@@ -97,4 +97,8 @@ export class UploadComponent {
       }
     });
   }
+
+  goToHistory(): void {
+    this.router.navigate(['/history']);
+  }
 }

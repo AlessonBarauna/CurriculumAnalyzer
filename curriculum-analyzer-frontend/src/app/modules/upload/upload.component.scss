@@ -29,8 +29,21 @@
 
   p {
     color: #666;
-    margin: 0;
+    margin: 0 0 0.75rem;
   }
+}
+
+.btn-history {
+  background: transparent;
+  border: 1px solid #4299e1;
+  color: #4299e1;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { background: #ebf8ff; }
 }
 
 .section {

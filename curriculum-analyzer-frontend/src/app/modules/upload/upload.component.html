@@ -3,6 +3,7 @@
     <div class="header">
       <h1>🎯 Analisador de Currículo</h1>
       <p>Análise profissional com IA para profissionais de TI</p>
+      <button class="btn-history" (click)="goToHistory()">📋 Ver Histórico</button>
     </div>
 
     <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()" class="upload-form">

@@ -98,4 +98,8 @@ export class AnalysisReportComponent implements OnInit {
   analyzeAnother(): void {
     this.router.navigate(['/']);
   }
+
+  goToHistory(): void {
+    this.router.navigate(['/history']);
+  }
 }

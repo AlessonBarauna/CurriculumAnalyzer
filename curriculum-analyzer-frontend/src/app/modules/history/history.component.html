@@ -1,0 +1,58 @@
+<div class="history-page">
+
+  <div class="history-header">
+    <div>
+      <h1>📋 Histórico de Análises</h1>
+      <p>Seus currículos analisados anteriormente</p>
+    </div>
+    <button class="btn-new" (click)="newAnalysis()">+ Nova Análise</button>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Carregando histórico...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-state">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="!loading && !errorMessage && history.length === 0" class="empty-state">
+    <p>📭 Nenhuma análise encontrada.</p>
+    <button class="btn-new" (click)="newAnalysis()">Analisar meu primeiro currículo</button>
+  </div>
+
+  <div *ngIf="!loading && history.length > 0" class="history-grid">
+    <div class="history-card" *ngFor="let item of history" (click)="openAnalysis(item.id)">
+
+      <div class="card-top">
+        <div class="score-circle" [style.border-color]="getScoreColor(item.overallScore)">
+          <span class="score-num" [style.color]="getScoreColor(item.overallScore)">{{ item.overallScore }}</span>
+          <span class="score-sub">/ 100</span>
+        </div>
+        <div class="card-info">
+          <h3>{{ item.fileName }}</h3>
+          <span class="score-badge" [style.background]="getScoreColor(item.overallScore)">
+            {{ getScoreLabel(item.overallScore) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-meta">
+        <span>🎯 {{ getLevelLabel(item.experienceLevel) }}</span>
+        <span>💻 {{ item.specialization }}</span>
+        <span>📅 {{ item.analysisDate | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+
+      <div class="card-salary">
+        💰 R$ {{ item.salaryMin | number:'1.0-0' }} – R$ {{ item.salaryMax | number:'1.0-0' }}
+      </div>
+
+      <div class="card-footer">
+        Ver análise completa →
+      </div>
+
+    </div>
+  </div>
+
+</div>

@@ -17,6 +17,29 @@ public class AnalysisController : ControllerBase
         _dbContext = dbContext;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetHistory()
+    {
+        var history = await _dbContext.Analyses
+            .Include(a => a.Curriculum)
+            .OrderByDescending(a => a.AnalysisDate)
+            .Select(a => new
+            {
+                a.Id,
+                a.OverallScore,
+                a.AnalysisDate,
+                a.Curriculum.FileName,
+                a.Curriculum.ExperienceLevel,
+                a.Curriculum.Specialization,
+                a.Curriculum.MarketObjective,
+                SalaryMin = a.EstimatedMinSalary,
+                SalaryMax = a.EstimatedMaxSalary
+            })
+            .ToListAsync();
+
+        return Ok(history);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAnalysis(string id)
     {
