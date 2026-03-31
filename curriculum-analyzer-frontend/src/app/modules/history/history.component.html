@@ -8,9 +8,22 @@
     <button class="btn-new" (click)="newAnalysis()">+ Nova Análise</button>
   </div>
 
-  <div *ngIf="loading()" class="loading-state">
-    <div class="spinner"></div>
-    <p>Carregando histórico...</p>
+  <div *ngIf="loading()" class="skeleton-grid">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]">
+      <div class="sk-top">
+        <div class="sk-circle"></div>
+        <div class="sk-lines">
+          <div class="sk-line wide"></div>
+          <div class="sk-line short"></div>
+        </div>
+      </div>
+      <div class="sk-line medium"></div>
+      <div class="sk-line medium"></div>
+      <div class="sk-salary"></div>
+      <div class="sk-footer">
+        <div class="sk-line short"></div>
+      </div>
+    </div>
   </div>
 
   <div *ngIf="errorMessage()" class="error-state">
