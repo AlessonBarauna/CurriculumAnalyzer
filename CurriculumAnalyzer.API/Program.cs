@@ -25,8 +25,16 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader());
 });
 
-var databaseUrl = builder.Configuration["DATABASE_URL"]
-    ?? Environment.GetEnvironmentVariable("DATABASE_URL");
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+if (string.IsNullOrEmpty(databaseUrl))
+{
+    throw new Exception("DATABASE_URL não configurado.");
+}
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(databaseUrl));
+    Console.WriteLine($"DATABASE_URL: {databaseUrl}");
 
 if (!string.IsNullOrEmpty(databaseUrl))
 {
