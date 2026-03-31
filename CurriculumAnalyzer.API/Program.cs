@@ -86,12 +86,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var isPostgres = db.Database.ProviderName?.Contains("Npgsql") == true;
-
-    if (isPostgres)
-        db.Database.EnsureCreated(); // cria schema diretamente no PostgreSQL Railway
-    else
-        db.Database.Migrate();      // aplica migrations incrementais no SQLite local
+    db.Database.Migrate();
 }
 
 app.Run();
