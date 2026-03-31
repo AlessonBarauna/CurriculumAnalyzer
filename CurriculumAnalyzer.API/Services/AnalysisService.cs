@@ -57,6 +57,20 @@ public class AnalysisService(AppDbContext dbContext) : IAnalysisService
         return (MapToDto(analyses[0]), MapToDto(analyses[1]));
     }
 
+    public async Task<bool> DeleteAsync(string id, string userId)
+    {
+        var analysis = await dbContext.Analyses
+            .Include(a => a.Curriculum)
+            .FirstOrDefaultAsync(a => a.Id == id && a.Curriculum.UserId == userId);
+
+        if (analysis is null) return false;
+
+        // Remove o currículo — o cascade apaga a análise junto
+        dbContext.Curriculums.Remove(analysis.Curriculum);
+        await dbContext.SaveChangesAsync();
+        return true;
+    }
+
     private static AnalysisResponseDto MapToDto(Data.Entities.AnalysisEntity a) => new()
     {
         Id = a.Id,

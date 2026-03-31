@@ -19,7 +19,7 @@ export class AnalysisService {
     return this.http.get<CurriculumAnalysis>(`${this.apiUrl}/analysis/${id}`);
   }
 
-  exportPDF(id: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/analysis/${id}/export-pdf`, { responseType: 'blob' });
+  deleteAnalysis(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/analysis/${id}`);
   }
 }

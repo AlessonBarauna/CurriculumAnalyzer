@@ -49,7 +49,14 @@
       </div>
 
       <div class="card-footer">
-        Ver análise completa →
+        <span>Ver análise completa →</span>
+        <button
+          class="btn-delete"
+          (click)="confirmDelete($event, item.id)"
+          [disabled]="deletingId() === item.id"
+          title="Excluir análise">
+          {{ deletingId() === item.id ? '...' : '🗑️' }}
+        </button>
       </div>
 
     </div>

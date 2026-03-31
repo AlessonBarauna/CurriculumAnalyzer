@@ -29,6 +29,13 @@ public class AnalysisController(IAnalysisService analysisService) : ControllerBa
         return analysis is null ? NotFound() : Ok(analysis);
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var deleted = await analysisService.DeleteAsync(id, UserId);
+        return deleted ? NoContent() : NotFound();
+    }
+
     [HttpGet("compare")]
     public async Task<IActionResult> Compare([FromQuery] string id1, [FromQuery] string id2)
     {

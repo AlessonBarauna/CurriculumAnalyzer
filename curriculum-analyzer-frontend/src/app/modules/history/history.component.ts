@@ -15,6 +15,7 @@ export class HistoryComponent implements OnInit {
   history = signal<AnalysisHistoryItem[]>([]);
   loading = signal(true);
   errorMessage = signal('');
+  deletingId = signal<string | null>(null);
 
   constructor(
     private analysisService: AnalysisService,
@@ -36,6 +37,23 @@ export class HistoryComponent implements OnInit {
 
   openAnalysis(id: string): void {
     this.router.navigate(['/analysis', id]);
+  }
+
+  confirmDelete(event: Event, id: string): void {
+    event.stopPropagation();
+    if (!confirm('Excluir esta análise? Esta ação não pode ser desfeita.')) return;
+
+    this.deletingId.set(id);
+    this.analysisService.deleteAnalysis(id).subscribe({
+      next: () => {
+        this.history.update(list => list.filter(item => item.id !== id));
+        this.deletingId.set(null);
+      },
+      error: () => {
+        this.deletingId.set(null);
+        alert('Erro ao excluir análise. Tente novamente.');
+      }
+    });
   }
 
   newAnalysis(): void {
