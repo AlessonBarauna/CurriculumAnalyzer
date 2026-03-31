@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CurriculumAnalyzer.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260331201105_InitialCreate")]
+    [Migration("20260331233155_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

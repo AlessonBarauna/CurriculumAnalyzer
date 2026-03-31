@@ -37,10 +37,11 @@ if (!string.IsNullOrEmpty(databaseUrl))
 else
 {
     // Desenvolvimento local: SQLite
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? "Data Source=curriculum_analyzer.db";
+    var connectionString = builder.Configuration.GetConnectionString("PostgresLocal")
+        ?? "Host=localhost;Port=5432;Database=curriculum_analyzer;Username=postgres;Password=postgres";
+
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlite(connectionString));
+        options.UseNpgsql(connectionString));
 }
 
 var rawJwtKey = builder.Configuration["Jwt:Key"];
