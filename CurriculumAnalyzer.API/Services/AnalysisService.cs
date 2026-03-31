@@ -14,10 +14,11 @@ public class AnalysisService(AppDbContext dbContext) : IAnalysisService
         NumberHandling = JsonNumberHandling.AllowReadingFromString
     };
 
-    public async Task<IEnumerable<object>> GetHistoryAsync()
+    public async Task<IEnumerable<object>> GetHistoryAsync(string userId)
     {
         return await dbContext.Analyses
             .Include(a => a.Curriculum)
+            .Where(a => a.Curriculum.UserId == userId)
             .OrderByDescending(a => a.AnalysisDate)
             .Select(a => new
             {
@@ -34,20 +35,20 @@ public class AnalysisService(AppDbContext dbContext) : IAnalysisService
             .ToListAsync<object>();
     }
 
-    public async Task<AnalysisResponseDto?> GetByIdAsync(string id)
+    public async Task<AnalysisResponseDto?> GetByIdAsync(string id, string userId)
     {
         var analysis = await dbContext.Analyses
             .Include(a => a.Curriculum)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Id == id && a.Curriculum.UserId == userId);
 
         return analysis is null ? null : MapToDto(analysis);
     }
 
-    public async Task<(AnalysisResponseDto Before, AnalysisResponseDto After)?> CompareAsync(string id1, string id2)
+    public async Task<(AnalysisResponseDto Before, AnalysisResponseDto After)?> CompareAsync(string id1, string id2, string userId)
     {
         var analyses = await dbContext.Analyses
             .Include(a => a.Curriculum)
-            .Where(a => a.Id == id1 || a.Id == id2)
+            .Where(a => (a.Id == id1 || a.Id == id2) && a.Curriculum.UserId == userId)
             .OrderBy(a => a.AnalysisDate)
             .ToListAsync();
 

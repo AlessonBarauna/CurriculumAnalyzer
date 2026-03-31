@@ -18,7 +18,8 @@ public class CurriculumAnalysisService(
         string fileName,
         string fileExtension,
         long fileSize,
-        UserContextModel userContext)
+        UserContextModel userContext,
+        string userId)
     {
         var extractedText = await fileService.ExtractTextAsync(fileStream, fileExtension);
 
@@ -29,7 +30,7 @@ public class CurriculumAnalysisService(
 
         var existing = await dbContext.Curriculums
             .Include(c => c.Analyses)
-            .FirstOrDefaultAsync(c => c.ContentHash == contentHash);
+            .FirstOrDefaultAsync(c => c.ContentHash == contentHash && c.UserId == userId);
 
         if (existing?.Analyses.Count > 0)
             return existing.Analyses.First().Id;
@@ -46,7 +47,8 @@ public class CurriculumAnalysisService(
             MarketObjective = userContext.MarketObjective,
             TargetSalary = userContext.TargetSalary,
             CurrentLocation = userContext.CurrentLocation,
-            ContentHash = contentHash
+            ContentHash = contentHash,
+            UserId = userId
         };
 
         dbContext.Curriculums.Add(curriculum);

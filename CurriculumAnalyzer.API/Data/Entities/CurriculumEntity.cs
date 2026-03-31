@@ -15,5 +15,7 @@ public class CurriculumEntity
     public decimal? TargetSalary { get; set; }
     public string CurrentLocation { get; set; } = string.Empty;
     public string ContentHash { get; set; } = string.Empty;
+    public string UserId { get; set; } = string.Empty;
+    public UserEntity? User { get; set; }
     public ICollection<AnalysisEntity> Analyses { get; set; } = new List<AnalysisEntity>();
 }

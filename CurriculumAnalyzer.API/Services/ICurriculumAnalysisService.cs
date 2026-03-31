@@ -13,5 +13,6 @@ public interface ICurriculumAnalysisService
         string fileName,
         string fileExtension,
         long fileSize,
-        UserContextModel userContext);
+        UserContextModel userContext,
+        string userId);
 }

@@ -1,13 +1,17 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 using CurriculumAnalyzer.API.Exceptions;
 using CurriculumAnalyzer.API.Models;
 using CurriculumAnalyzer.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurriculumAnalyzer.API.Controllers;
 
 [ApiController]
 [Route("api/curriculum")]
+[Authorize]
 public class CurriculumController(ICurriculumAnalysisService analysisService) : ControllerBase
 {
     private static readonly string[] AllowedContentTypes =
@@ -45,9 +49,13 @@ public class CurriculumController(ICurriculumAnalysisService analysisService) : 
 
         var extension = Path.GetExtension(file.FileName).TrimStart('.');
 
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+            ?? throw new ValidationException("Usuário não identificado.");
+
         using var stream = file.OpenReadStream();
         var analysisId = await analysisService.ProcessUploadAsync(
-            stream, file.FileName, extension, file.Length, userContext);
+            stream, file.FileName, extension, file.Length, userContext, userId);
 
         return Ok(new { analysisId });
     }
