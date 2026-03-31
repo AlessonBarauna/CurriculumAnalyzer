@@ -25,8 +25,45 @@
     <button class="btn-new" (click)="newAnalysis()">Analisar meu primeiro currículo</button>
   </div>
 
-  <div *ngIf="!loading() && history().length > 0" class="history-grid">
-    <div class="history-card" *ngFor="let item of history()" (click)="openAnalysis(item.id)">
+  <div *ngIf="!loading() && history().length > 0" class="filter-bar">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="🔍 Buscar por nome do arquivo..."
+      [ngModel]="searchQuery()"
+      (ngModelChange)="searchQuery.set($event)">
+
+    <select
+      class="filter-select"
+      [ngModel]="filterLevel()"
+      (ngModelChange)="filterLevel.set($event)">
+      <option value="">Todos os níveis</option>
+      <option value="junior">Junior</option>
+      <option value="mid-level">Mid-Level</option>
+      <option value="senior">Sênior</option>
+    </select>
+
+    <select
+      class="filter-select"
+      [ngModel]="filterSpec()"
+      (ngModelChange)="filterSpec.set($event)">
+      <option value="">Todas as especializações</option>
+      <option value="backend">Backend</option>
+      <option value="frontend">Frontend</option>
+      <option value="fullstack">FullStack</option>
+      <option value="devops">DevOps</option>
+      <option value="data-engineer">Data Engineer</option>
+      <option value="qa">QA</option>
+      <option value="security">Security</option>
+    </select>
+  </div>
+
+  <div *ngIf="!loading() && history().length > 0 && filteredHistory().length === 0" class="empty-state">
+    <p>🔍 Nenhuma análise corresponde aos filtros.</p>
+  </div>
+
+  <div *ngIf="!loading() && filteredHistory().length > 0" class="history-grid">
+    <div class="history-card" *ngFor="let item of filteredHistory()" (click)="openAnalysis(item.id)">
 
       <div class="card-top">
         <div class="score-circle" [style.border-color]="getScoreColor(item.overallScore)">

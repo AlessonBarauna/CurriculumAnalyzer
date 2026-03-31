@@ -1,5 +1,6 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AnalysisService } from '../../shared/services/analysis.service';
 import { AnalysisHistoryItem } from '../../shared/models/history.model';
@@ -7,7 +8,7 @@ import { AnalysisHistoryItem } from '../../shared/models/history.model';
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.scss']
 })
@@ -16,6 +17,23 @@ export class HistoryComponent implements OnInit {
   loading = signal(true);
   errorMessage = signal('');
   deletingId = signal<string | null>(null);
+
+  searchQuery = signal('');
+  filterLevel = signal('');
+  filterSpec = signal('');
+
+  filteredHistory = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    const level = this.filterLevel();
+    const spec = this.filterSpec();
+
+    return this.history().filter(item => {
+      const matchesQuery = !query || item.fileName.toLowerCase().includes(query);
+      const matchesLevel = !level || item.experienceLevel === level;
+      const matchesSpec = !spec || item.specialization === spec;
+      return matchesQuery && matchesLevel && matchesSpec;
+    });
+  });
 
   constructor(
     private analysisService: AnalysisService,
