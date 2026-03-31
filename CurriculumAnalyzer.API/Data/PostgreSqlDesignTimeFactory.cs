@@ -12,9 +12,13 @@ public class PostgreSqlDesignTimeFactory : IDesignTimeDbContextFactory<AppDbCont
     public AppDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-        optionsBuilder.UseNpgsql(
-            "Host=localhost;Database=curriculum_analyzer;Username=postgres;Password=postgres",
-            npg => npg.MigrationsHistoryTable("__EFMigrationsHistory"));
+
+        var connectionString =
+            Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+            ?? "Host=localhost;Database=curriculum_analyzer;Username=postgres;Password=postgres";
+
+        optionsBuilder.UseNpgsql(connectionString);
+
         return new AppDbContext(optionsBuilder.Options);
     }
 }

@@ -1,12 +1,14 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CurriculumAnalyzer.API.Migrations.Pgsql
+namespace CurriculumAnalyzer.API.Migrations
 {
-    public partial class InitialPostgres : Migration
+    /// <inheritdoc />
+    public partial class InitialCreate : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -85,10 +87,14 @@ namespace CurriculumAnalyzer.API.Migrations.Pgsql
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_Email",
-                table: "Users",
-                column: "Email",
-                unique: true);
+                name: "IX_Analyses_AnalysisDate",
+                table: "Analyses",
+                column: "AnalysisDate");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Analyses_CurriculumId",
+                table: "Analyses",
+                column: "CurriculumId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Curriculums_UploadedAt",
@@ -101,21 +107,23 @@ namespace CurriculumAnalyzer.API.Migrations.Pgsql
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Analyses_AnalysisDate",
-                table: "Analyses",
-                column: "AnalysisDate");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Analyses_CurriculumId",
-                table: "Analyses",
-                column: "CurriculumId");
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(name: "Analyses");
-            migrationBuilder.DropTable(name: "Curriculums");
-            migrationBuilder.DropTable(name: "Users");
+            migrationBuilder.DropTable(
+                name: "Analyses");
+
+            migrationBuilder.DropTable(
+                name: "Curriculums");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
