@@ -1,0 +1,59 @@
+<div class="profile-page">
+
+  <div class="profile-header">
+    <h1>👤 Meu Perfil</h1>
+    <p>Gerencie suas informações de conta</p>
+  </div>
+
+  <div class="profile-grid">
+
+    <!-- NOME -->
+    <div class="profile-card">
+      <h2>Informações Pessoais</h2>
+
+      <div class="avatar">
+        <span>{{ authService.currentUser()?.name?.[0]?.toUpperCase() }}</span>
+      </div>
+
+      <p class="user-email">{{ authService.currentUser()?.email }}</p>
+
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" formControlName="name" placeholder="Seu nome completo">
+        </div>
+
+        <button type="submit" class="btn-save" [disabled]="savingProfile() || profileForm.invalid">
+          {{ savingProfile() ? 'Salvando...' : 'Salvar Nome' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- SENHA -->
+    <div class="profile-card">
+      <h2>Alterar Senha</h2>
+
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+        <div class="form-group">
+          <label>Senha atual</label>
+          <input type="password" formControlName="currentPassword" placeholder="••••••">
+        </div>
+
+        <div class="form-group">
+          <label>Nova senha <span class="hint">(mínimo 6 caracteres)</span></label>
+          <input type="password" formControlName="newPassword" placeholder="••••••">
+        </div>
+
+        <div class="form-group">
+          <label>Confirmar nova senha</label>
+          <input type="password" formControlName="confirmPassword" placeholder="••••••">
+        </div>
+
+        <button type="submit" class="btn-save" [disabled]="savingPassword() || passwordForm.invalid">
+          {{ savingPassword() ? 'Alterando...' : 'Alterar Senha' }}
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>

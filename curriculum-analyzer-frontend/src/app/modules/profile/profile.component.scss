@@ -1,0 +1,108 @@
+.profile-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.profile-header {
+  margin-bottom: 2rem;
+  h1 { margin: 0; font-size: 1.75rem; color: #1a202c; }
+  p  { margin: 0.25rem 0 0; color: #718096; }
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+.profile-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+
+  h2 {
+    margin: 0 0 1.5rem;
+    font-size: 1.05rem;
+    color: #2d3748;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+
+  span {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+  }
+}
+
+.user-email {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #718096;
+  margin: 0 0 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+
+  label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4a5568;
+
+    .hint { font-weight: 400; color: #a0aec0; }
+  }
+
+  input {
+    padding: 0.7rem 0.875rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+
+    &:focus {
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66,153,225,0.1);
+    }
+  }
+}
+
+.btn-save {
+  width: 100%;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: all 0.2s;
+
+  &:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(66,153,225,0.35);
+  }
+
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
