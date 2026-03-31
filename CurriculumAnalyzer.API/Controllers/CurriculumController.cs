@@ -22,16 +22,10 @@ public class CurriculumController(ICurriculumAnalysisService analysisService) : 
     ];
 
     [HttpPost("upload-and-analyze")]
-    public async Task<IActionResult> UploadAndAnalyze(IFormFile file, [FromForm] string context)
+    public async Task<IActionResult> UploadAndAnalyze(IFormFile file, [FromForm] string? context)
     {
-        if (file == null || file.Length == 0)
-            return BadRequest(new { error = "Arquivo não fornecido." });
-
-        if (!AllowedContentTypes.Contains(file.ContentType))
-            return BadRequest(new { error = "Tipo de arquivo não suportado. Use PDF, DOCX ou TXT." });
-
-        if (file.Length > 5 * 1024 * 1024)
-            return BadRequest(new { error = "Arquivo muito grande. Máximo 5MB." });
+        if (string.IsNullOrWhiteSpace(context))
+            return BadRequest(new { error = "Contexto não fornecido." });
 
         UserContextModel? userContext;
         try
@@ -39,13 +33,17 @@ public class CurriculumController(ICurriculumAnalysisService analysisService) : 
             userContext = JsonSerializer.Deserialize<UserContextModel>(context,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
-        catch
+        catch (JsonException ex)
         {
-            return BadRequest(new { error = "Contexto inválido." });
+            return BadRequest(new { error = $"JSON inválido: {ex.Message}" });
         }
 
         if (userContext == null)
-            return BadRequest(new { error = "Contexto não fornecido." });
+            return BadRequest(new { error = "Contexto desserializado como nulo." });
+
+        // Validações customizadas
+        if (string.IsNullOrEmpty(userContext.ExperienceLevel))
+            return BadRequest(new { error = "ExperienceLevel é obrigatório." });
 
         var extension = Path.GetExtension(file.FileName).TrimStart('.');
 
