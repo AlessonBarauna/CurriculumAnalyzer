@@ -8,22 +8,22 @@
     <button class="btn-new" (click)="newAnalysis()">+ Nova Análise</button>
   </div>
 
-  <div *ngIf="loading" class="loading-state">
+  <div *ngIf="loading()" class="loading-state">
     <div class="spinner"></div>
     <p>Carregando histórico...</p>
   </div>
 
-  <div *ngIf="errorMessage" class="error-state">
-    <p>{{ errorMessage }}</p>
+  <div *ngIf="errorMessage()" class="error-state">
+    <p>{{ errorMessage() }}</p>
   </div>
 
-  <div *ngIf="!loading && !errorMessage && history.length === 0" class="empty-state">
+  <div *ngIf="!loading() && !errorMessage() && history().length === 0" class="empty-state">
     <p>📭 Nenhuma análise encontrada.</p>
     <button class="btn-new" (click)="newAnalysis()">Analisar meu primeiro currículo</button>
   </div>
 
-  <div *ngIf="!loading && history.length > 0" class="history-grid">
-    <div class="history-card" *ngFor="let item of history" (click)="openAnalysis(item.id)">
+  <div *ngIf="!loading() && history().length > 0" class="history-grid">
+    <div class="history-card" *ngFor="let item of history()" (click)="openAnalysis(item.id)">
 
       <div class="card-top">
         <div class="score-circle" [style.border-color]="getScoreColor(item.overallScore)">

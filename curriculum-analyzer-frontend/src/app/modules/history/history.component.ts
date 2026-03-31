@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AnalysisService } from '../../shared/services/analysis.service';
@@ -12,27 +12,24 @@ import { AnalysisHistoryItem } from '../../shared/models/history.model';
   styleUrls: ['./history.component.scss']
 })
 export class HistoryComponent implements OnInit {
-  history: AnalysisHistoryItem[] = [];
-  loading = true;
-  errorMessage = '';
+  history = signal<AnalysisHistoryItem[]>([]);
+  loading = signal(true);
+  errorMessage = signal('');
 
   constructor(
     private analysisService: AnalysisService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.analysisService.getHistory().subscribe({
       next: (data) => {
-        this.history = data;
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.history.set(data);
+        this.loading.set(false);
       },
       error: () => {
-        this.errorMessage = 'Erro ao carregar histórico.';
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.errorMessage.set('Erro ao carregar histórico.');
+        this.loading.set(false);
       }
     });
   }

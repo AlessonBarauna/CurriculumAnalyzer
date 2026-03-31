@@ -1,8 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalysisService } from '../../shared/services/analysis.service';
 import { CurriculumAnalysis, ActionItem } from '../../shared/models/analysis.model';
+
+type Tab = 'overview' | 'strengths' | 'weaknesses' | 'plan' | 'jobs';
 
 @Component({
   selector: 'app-analysis-report',
@@ -12,48 +14,46 @@ import { CurriculumAnalysis, ActionItem } from '../../shared/models/analysis.mod
   styleUrls: ['./analysis-report.component.scss']
 })
 export class AnalysisReportComponent implements OnInit {
-  analysis: CurriculumAnalysis | null = null;
-  loading = true;
-  errorMessage = '';
-  activeTab: 'overview' | 'strengths' | 'weaknesses' | 'plan' | 'jobs' = 'overview';
+  analysis = signal<CurriculumAnalysis | null>(null);
+  loading = signal(true);
+  errorMessage = signal('');
+  activeTab = signal<Tab>('overview');
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private analysisService: AnalysisService,
-    private cdr: ChangeDetectorRef
+    private analysisService: AnalysisService
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (!id) {
-      this.errorMessage = 'ID de análise não encontrado.';
-      this.loading = false;
+      this.errorMessage.set('ID de análise não encontrado.');
+      this.loading.set(false);
       return;
     }
 
     this.analysisService.getAnalysis(id).subscribe({
-      next: (analysis) => {
-        this.analysis = analysis;
-        this.loading = false;
-        this.cdr.detectChanges();
+      next: (data) => {
+        this.analysis.set(data);
+        this.loading.set(false);
       },
       error: (err) => {
-        this.errorMessage = `Erro: ${err?.status ?? ''} ${err?.message ?? ''}`;
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.errorMessage.set(`Erro: ${err?.status ?? ''} ${err?.message ?? ''}`);
+        this.loading.set(false);
       }
     });
   }
 
   getSectionEntries(): { key: string; value: any }[] {
-    if (!this.analysis?.sections) return [];
-    return Object.entries(this.analysis.sections).map(([key, value]) => ({ key, value }));
+    const sections = this.analysis()?.sections;
+    if (!sections) return [];
+    return Object.entries(sections).map(([key, value]) => ({ key, value }));
   }
 
   getActionPlanByTimeline(timeline: string): ActionItem[] {
-    return this.analysis?.actionPlan?.filter(item => item.timeline === timeline) ?? [];
+    return this.analysis()?.actionPlan?.filter(item => item.timeline === timeline) ?? [];
   }
 
   getScoreColor(score: number): string {

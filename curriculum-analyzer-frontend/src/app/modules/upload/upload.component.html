@@ -10,12 +10,12 @@
 
       <div class="section">
         <h3>1. Envie seu currículo</h3>
-        <div class="file-drop-zone" [class.has-file]="selectedFile">
+        <div class="file-drop-zone" [class.has-file]="selectedFile()">
           <input type="file" id="fileInput" accept=".pdf,.docx,.txt" (change)="onFileSelected($event)" hidden>
           <label for="fileInput" class="file-label">
             <span class="icon">📄</span>
-            <span *ngIf="!selectedFile">Clique para selecionar PDF, DOCX ou TXT (máx. 5MB)</span>
-            <span *ngIf="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+            <span *ngIf="!selectedFile()">Clique para selecionar PDF, DOCX ou TXT (máx. 5MB)</span>
+            <span *ngIf="selectedFile()" class="file-name">{{ selectedFile()!.name }}</span>
           </label>
         </div>
       </div>
@@ -54,13 +54,13 @@
         </div>
       </div>
 
-      <div *ngIf="errorMessage" class="error-message">
-        ⚠️ {{ errorMessage }}
+      <div *ngIf="errorMessage()" class="error-message">
+        ⚠️ {{ errorMessage() }}
       </div>
 
-      <button type="submit" class="btn-analyze" [disabled]="loading || !selectedFile">
-        <span *ngIf="!loading">🚀 Analisar Currículo</span>
-        <span *ngIf="loading" class="loading-text">
+      <button type="submit" class="btn-analyze" [disabled]="loading() || !selectedFile()">
+        <span *ngIf="!loading()">🚀 Analisar Currículo</span>
+        <span *ngIf="loading()" class="loading-text">
           <span class="spinner"></span> Analisando com IA...
         </span>
       </button>

@@ -1,49 +1,49 @@
-<div *ngIf="loading" class="loading-overlay">
+<div *ngIf="loading()" class="loading-overlay">
   <div class="loading-box">
     <div class="spinner-large"></div>
     <p>Carregando análise...</p>
   </div>
 </div>
 
-<div *ngIf="errorMessage" class="error-page">
-  <p>{{ errorMessage }}</p>
+<div *ngIf="errorMessage()" class="error-page">
+  <p>{{ errorMessage() }}</p>
   <button (click)="analyzeAnother()">Voltar</button>
 </div>
 
-<div *ngIf="!loading && !errorMessage && analysis" class="report-page">
+<div *ngIf="!loading() && !errorMessage() && analysis()" class="report-page">
 
   <!-- HEADER -->
   <div class="report-header">
     <div class="header-content">
       <h1>📊 Análise de Currículo</h1>
-      <div class="score-badge" [style.background]="getScoreColor(analysis.overallScore)">
-        <span class="score-number">{{ analysis.overallScore }}</span>
+      <div class="score-badge" [style.background]="getScoreColor(analysis()!.overallScore)">
+        <span class="score-number">{{ analysis()!.overallScore }}</span>
         <span class="score-max">/100</span>
-        <span class="score-label">{{ getScoreLabel(analysis.overallScore) }}</span>
+        <span class="score-label">{{ getScoreLabel(analysis()!.overallScore) }}</span>
       </div>
     </div>
-    <p class="score-explanation">{{ analysis.scoreExplanation }}</p>
+    <p class="score-explanation">{{ analysis()!.scoreExplanation }}</p>
   </div>
 
   <!-- TABS -->
   <div class="tabs-bar">
-    <button (click)="activeTab = 'overview'" [class.active]="activeTab === 'overview'">📋 Visão Geral</button>
-    <button (click)="activeTab = 'strengths'" [class.active]="activeTab === 'strengths'">✅ Pontos Fortes</button>
-    <button (click)="activeTab = 'weaknesses'" [class.active]="activeTab === 'weaknesses'">⚠️ Melhorias</button>
-    <button (click)="activeTab = 'plan'" [class.active]="activeTab === 'plan'">🎯 Plano de Ação</button>
-    <button (click)="activeTab = 'jobs'" [class.active]="activeTab === 'jobs'">💼 Vagas</button>
+    <button (click)="activeTab.set('overview')" [class.active]="activeTab() === 'overview'">📋 Visão Geral</button>
+    <button (click)="activeTab.set('strengths')" [class.active]="activeTab() === 'strengths'">✅ Pontos Fortes</button>
+    <button (click)="activeTab.set('weaknesses')" [class.active]="activeTab() === 'weaknesses'">⚠️ Melhorias</button>
+    <button (click)="activeTab.set('plan')" [class.active]="activeTab() === 'plan'">🎯 Plano de Ação</button>
+    <button (click)="activeTab.set('jobs')" [class.active]="activeTab() === 'jobs'">💼 Vagas</button>
   </div>
 
   <!-- CONTENT -->
   <div class="tab-content">
 
     <!-- OVERVIEW -->
-    <div *ngIf="activeTab === 'overview'">
+    <div *ngIf="activeTab() === 'overview'">
       <div class="salary-card">
         <h3>💰 Estimativa Salarial</h3>
         <p class="salary-range">
-          R$ {{ analysis.estimatedSalaryRange.min | number:'1.0-0' }} –
-          R$ {{ analysis.estimatedSalaryRange.max | number:'1.0-0' }}
+          R$ {{ analysis()!.estimatedSalaryRange.min | number:'1.0-0' }} –
+          R$ {{ analysis()!.estimatedSalaryRange.max | number:'1.0-0' }}
         </p>
       </div>
 
@@ -63,10 +63,10 @@
     </div>
 
     <!-- STRENGTHS -->
-    <div *ngIf="activeTab === 'strengths'">
+    <div *ngIf="activeTab() === 'strengths'">
       <h2>✅ O que está funcionando bem</h2>
       <div class="card-list">
-        <div class="feedback-card strength" *ngFor="let item of analysis.strengths">
+        <div class="feedback-card strength" *ngFor="let item of analysis()!.strengths">
           <div class="card-priority" [ngClass]="'p-' + item.priority">{{ item.priority }}</div>
           <h4>{{ item.title }}</h4>
           <p>{{ item.description }}</p>
@@ -76,10 +76,10 @@
     </div>
 
     <!-- WEAKNESSES -->
-    <div *ngIf="activeTab === 'weaknesses'">
+    <div *ngIf="activeTab() === 'weaknesses'">
       <h2>⚠️ Pontos que Precisam de Atenção</h2>
       <div class="card-list">
-        <div class="feedback-card weakness" *ngFor="let item of analysis.weaknesses" [ngClass]="'p-' + item.priority">
+        <div class="feedback-card weakness" *ngFor="let item of analysis()!.weaknesses" [ngClass]="'p-' + item.priority">
           <div class="card-priority" [ngClass]="'p-' + item.priority">{{ item.priority }}</div>
           <h4>{{ item.title }}</h4>
           <p><strong>Problema:</strong> {{ item.description }}</p>
@@ -99,7 +99,7 @@
     </div>
 
     <!-- ACTION PLAN -->
-    <div *ngIf="activeTab === 'plan'">
+    <div *ngIf="activeTab() === 'plan'">
       <h2>🎯 Plano de Ação Personalizado</h2>
 
       <div class="timeline-phases">
@@ -130,7 +130,7 @@
 
       <h3 class="section-title">🌟 Oportunidades com Alto ROI</h3>
       <div class="opportunities-grid">
-        <div class="opportunity-card" *ngFor="let opp of analysis.opportunities">
+        <div class="opportunity-card" *ngFor="let opp of analysis()!.opportunities">
           <h4>{{ opp.title }}</h4>
           <p>{{ opp.description }}</p>
           <div class="opp-meta">
@@ -143,10 +143,10 @@
     </div>
 
     <!-- JOBS -->
-    <div *ngIf="activeTab === 'jobs'">
+    <div *ngIf="activeTab() === 'jobs'">
       <h2>💼 Recomendações por Tipo de Vaga</h2>
       <div class="jobs-grid">
-        <div class="job-card" *ngFor="let job of analysis.jobRecommendations">
+        <div class="job-card" *ngFor="let job of analysis()!.jobRecommendations">
           <div class="job-header">
             <h3>{{ getJobTypeLabel(job.type) }}</h3>
             <span class="fit-badge" [ngClass]="'fit-' + job.fit">{{ job.fit }}</span>

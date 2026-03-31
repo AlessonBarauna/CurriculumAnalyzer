@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,9 +13,9 @@ import { CurriculumService } from '../../shared/services/curriculum.service';
 })
 export class UploadComponent {
   uploadForm: FormGroup;
-  loading = false;
-  selectedFile: File | null = null;
-  errorMessage = '';
+  loading = signal(false);
+  selectedFile = signal<File | null>(null);
+  errorMessage = signal('');
 
   levelOptions = [
     { value: 'junior', label: 'Junior (0-2 anos)' },
@@ -50,7 +50,7 @@ export class UploadComponent {
   onFileSelected(event: Event): void {
     const target = event.target as HTMLInputElement;
     const files = target.files;
-    this.errorMessage = '';
+    this.errorMessage.set('');
 
     if (!files || files.length === 0) return;
 
@@ -62,29 +62,29 @@ export class UploadComponent {
     ];
 
     if (!validTypes.includes(file.type)) {
-      this.errorMessage = 'Arquivo inválido. Use PDF, DOCX ou TXT.';
+      this.errorMessage.set('Arquivo inválido. Use PDF, DOCX ou TXT.');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      this.errorMessage = 'Arquivo muito grande (máximo 5MB).';
+      this.errorMessage.set('Arquivo muito grande (máximo 5MB).');
       return;
     }
 
-    this.selectedFile = file;
+    this.selectedFile.set(file);
   }
 
   async onSubmit(): Promise<void> {
-    if (!this.uploadForm.valid || !this.selectedFile) {
-      this.errorMessage = 'Preencha todos os campos obrigatórios e selecione um arquivo.';
+    if (!this.uploadForm.valid || !this.selectedFile()) {
+      this.errorMessage.set('Preencha todos os campos obrigatórios e selecione um arquivo.');
       return;
     }
 
-    this.loading = true;
-    this.errorMessage = '';
+    this.loading.set(true);
+    this.errorMessage.set('');
 
     const formData = new FormData();
-    formData.append('file', this.selectedFile);
+    formData.append('file', this.selectedFile()!);
     formData.append('context', JSON.stringify(this.uploadForm.value));
 
     this.curriculumService.uploadAndAnalyze(formData).subscribe({
@@ -92,8 +92,8 @@ export class UploadComponent {
         this.router.navigate(['/analysis', result.analysisId]);
       },
       error: (err) => {
-        this.errorMessage = err?.error?.error || 'Erro ao processar arquivo. Tente novamente.';
-        this.loading = false;
+        this.errorMessage.set(err?.error?.error || 'Erro ao processar arquivo. Tente novamente.');
+        this.loading.set(false);
       }
     });
   }
