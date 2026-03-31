@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ApiConfigService } from './api-config.service';
 
 interface AuthResponse {
@@ -27,15 +27,11 @@ export class AuthService {
   private get apiUrl() { return this.config.apiUrl; }
 
   login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, { email, password }).pipe(
-      tap(res => this.saveSession(res))
-    );
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, { email, password });
   }
 
   register(name: string, email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, { name, email, password }).pipe(
-      tap(res => this.saveSession(res))
-    );
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, { name, email, password });
   }
 
   logout(): void {
@@ -48,7 +44,7 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  private saveSession(res: AuthResponse): void {
+  saveSession(res: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, res.token);
     localStorage.setItem(this.USER_KEY, JSON.stringify({ name: res.name, email: res.email }));
     this.currentUser.set({ name: res.name, email: res.email });

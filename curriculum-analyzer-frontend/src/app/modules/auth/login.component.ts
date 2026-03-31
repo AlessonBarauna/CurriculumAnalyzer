@@ -52,7 +52,11 @@ export class LoginComponent {
     this.errorMessage.set('');
 
     this.authService.login(email, password).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: (res) => {
+        this.authService.saveSession(res);
+        this.loading.set(false);
+        this.router.navigate(['/']);
+      },
       error: (err) => {
         this.errorMessage.set(err?.error?.error || 'E-mail ou senha inválidos.');
         this.loading.set(false);
@@ -73,7 +77,11 @@ export class LoginComponent {
     this.errorMessage.set('');
 
     this.authService.register(name, email, password).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: (res) => {
+        this.authService.saveSession(res);
+        this.loading.set(false);
+        this.router.navigate(['/']);
+      },
       error: (err) => {
         this.errorMessage.set(err?.error?.error || 'Erro ao criar conta. Tente novamente.');
         this.loading.set(false);
