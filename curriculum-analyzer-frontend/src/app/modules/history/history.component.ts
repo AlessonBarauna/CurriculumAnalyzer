@@ -60,6 +60,10 @@ export class HistoryComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
+  compareAnalyses(): void {
+    this.router.navigate(['/compare']);
+  }
+
   getScoreColor(score: number): string {
     if (score >= 90) return '#4CAF50';
     if (score >= 75) return '#8BC34A';

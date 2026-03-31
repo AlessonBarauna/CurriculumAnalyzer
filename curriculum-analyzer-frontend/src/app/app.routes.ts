@@ -25,5 +25,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/analysis-report/analysis-report.component').then(m => m.AnalysisReportComponent)
   },
+  {
+    path: 'compare',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./modules/compare/compare.component').then(m => m.CompareComponent)
+  },
   { path: '**', redirectTo: '' }
 ];

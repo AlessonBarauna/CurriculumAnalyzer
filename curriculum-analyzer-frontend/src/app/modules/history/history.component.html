@@ -5,7 +5,10 @@
       <h1>📋 Histórico de Análises</h1>
       <p>Seus currículos analisados anteriormente</p>
     </div>
-    <button class="btn-new" (click)="newAnalysis()">+ Nova Análise</button>
+    <div class="header-actions">
+      <button class="btn-compare" (click)="compareAnalyses()">⚖️ Comparar</button>
+      <button class="btn-new" (click)="newAnalysis()">+ Nova Análise</button>
+    </div>
   </div>
 
   <div *ngIf="loading()" class="loading-state">

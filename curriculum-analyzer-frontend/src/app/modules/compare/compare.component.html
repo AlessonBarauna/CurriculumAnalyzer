@@ -1,0 +1,158 @@
+<div class="compare-page">
+
+  <div class="compare-header">
+    <button class="btn-back" (click)="goBack()">← Voltar</button>
+    <div>
+      <h1>⚖️ Comparar Análises</h1>
+      <p>Selecione 2 análises para comparar lado a lado</p>
+    </div>
+  </div>
+
+  <!-- Seleção -->
+  <div *ngIf="loadingHistory()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Carregando histórico...</p>
+  </div>
+
+  <ng-container *ngIf="!loadingHistory()">
+
+    <div class="selection-bar">
+      <div class="selection-info">
+        <span *ngIf="selected().length === 0">Nenhuma análise selecionada</span>
+        <span *ngIf="selected().length === 1">1 de 2 selecionadas — escolha mais uma</span>
+        <span *ngIf="selected().length === 2">2 análises selecionadas</span>
+      </div>
+      <button
+        class="btn-compare"
+        [disabled]="!canCompare() || loadingCompare()"
+        (click)="compare()">
+        {{ loadingCompare() ? 'Comparando...' : '⚖️ Comparar' }}
+      </button>
+    </div>
+
+    <div class="history-grid">
+      <div
+        class="history-card"
+        *ngFor="let item of history()"
+        [class.selected]="isSelected(item.id)"
+        [class.disabled]="selected().length === 2 && !isSelected(item.id)"
+        (click)="toggleSelect(item.id)">
+
+        <div class="selection-badge" *ngIf="isSelected(item.id)">
+          {{ selectionIndex(item.id) }}
+        </div>
+
+        <div class="card-top">
+          <div class="score-circle" [style.border-color]="getScoreColor(item.overallScore)">
+            <span class="score-num" [style.color]="getScoreColor(item.overallScore)">{{ item.overallScore }}</span>
+            <span class="score-sub">/ 100</span>
+          </div>
+          <div class="card-info">
+            <h3>{{ item.fileName }}</h3>
+            <span class="card-date">{{ item.analysisDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <div class="card-meta">
+          <span>🎯 {{ item.experienceLevel }}</span>
+          <span>💻 {{ item.specialization }}</span>
+        </div>
+
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Erro -->
+  <div *ngIf="errorMessage()" class="error-state">
+    <p>{{ errorMessage() }}</p>
+  </div>
+
+  <!-- Resultado da comparação -->
+  <div *ngIf="result()" class="compare-result">
+
+    <h2 class="result-title">Resultado da Comparação</h2>
+
+    <!-- Cabeçalho das colunas -->
+    <div class="columns-header">
+      <div class="col-label">Seção</div>
+      <div class="col-a">
+        <span class="col-tag tag-a">A</span>
+        {{ selectedItems()[0]?.fileName }}
+      </div>
+      <div class="col-delta">Δ</div>
+      <div class="col-b">
+        <span class="col-tag tag-b">B</span>
+        {{ selectedItems()[1]?.fileName }}
+      </div>
+    </div>
+
+    <!-- Seções -->
+    <div class="section-row" *ngFor="let key of getSectionKeys(result()!.before)">
+      <div class="col-label section-name">{{ key }}</div>
+      <div class="col-a">
+        <span class="score-pill" [style.background]="getScoreColor(result()!.before.sections[key].score)">
+          {{ result()!.before.sections[key].score }}
+        </span>
+      </div>
+      <div class="col-delta">
+        <span
+          class="delta"
+          [class.positive]="scoreDelta(key) > 0"
+          [class.negative]="scoreDelta(key) < 0"
+          [class.neutral]="scoreDelta(key) === 0">
+          {{ scoreDelta(key) > 0 ? '+' : '' }}{{ scoreDelta(key) === 0 ? '=' : scoreDelta(key) }}
+        </span>
+      </div>
+      <div class="col-b">
+        <span class="score-pill" [style.background]="getScoreColor(result()!.after.sections[key].score)">
+          {{ result()!.after.sections[key].score }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Pontos fortes -->
+    <div class="feedback-section">
+      <h3>✅ Pontos Fortes</h3>
+      <div class="feedback-columns">
+        <div class="feedback-col">
+          <div class="feedback-item" *ngFor="let s of result()!.before.strengths">
+            <strong>{{ s.title }}</strong>
+            <p>{{ s.description }}</p>
+          </div>
+          <div *ngIf="result()!.before.strengths.length === 0" class="empty-feedback">Nenhum ponto forte registrado.</div>
+        </div>
+        <div class="feedback-col">
+          <div class="feedback-item" *ngFor="let s of result()!.after.strengths">
+            <strong>{{ s.title }}</strong>
+            <p>{{ s.description }}</p>
+          </div>
+          <div *ngIf="result()!.after.strengths.length === 0" class="empty-feedback">Nenhum ponto forte registrado.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pontos fracos -->
+    <div class="feedback-section">
+      <h3>⚠️ Pontos Fracos</h3>
+      <div class="feedback-columns">
+        <div class="feedback-col">
+          <div class="feedback-item weakness" *ngFor="let w of result()!.before.weaknesses">
+            <strong>{{ w.title }}</strong>
+            <p>{{ w.description }}</p>
+          </div>
+          <div *ngIf="result()!.before.weaknesses.length === 0" class="empty-feedback">Nenhum ponto fraco registrado.</div>
+        </div>
+        <div class="feedback-col">
+          <div class="feedback-item weakness" *ngFor="let w of result()!.after.weaknesses">
+            <strong>{{ w.title }}</strong>
+            <p>{{ w.description }}</p>
+          </div>
+          <div *ngIf="result()!.after.weaknesses.length === 0" class="empty-feedback">Nenhum ponto fraco registrado.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
