@@ -27,6 +27,8 @@ builder.Services.AddCors(options =>
 
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
+Console.WriteLine($"DATABASE_URL: {databaseUrl}");
+
 if (string.IsNullOrEmpty(databaseUrl))
 {
     throw new Exception("DATABASE_URL não configurado.");
