@@ -117,7 +117,13 @@ export class UploadComponent implements OnDestroy {
       next: (result) => {
         this.stopStepTimer();
         this.currentStep.set(STEPS.length - 1);
-        setTimeout(() => this.router.navigate(['/analysis', result.analysisId]), 600);
+        this.loading.set(false);
+        this.router.navigate(['/analysis', result.analysisId]).then(navigated => {
+          if (!navigated) {
+            this.errorMessage.set('Análise concluída! Acesse o histórico para visualizá-la.');
+            this.currentStep.set(0);
+          }
+        });
       },
       error: (err) => {
         this.stopStepTimer();
