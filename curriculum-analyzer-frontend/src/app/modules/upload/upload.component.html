@@ -14,12 +14,19 @@
 
       <div class="section">
         <h3>1. Envie seu currículo</h3>
-        <div class="file-drop-zone" [class.has-file]="selectedFile()">
+        <div
+          class="file-drop-zone"
+          [class.has-file]="selectedFile()"
+          [class.drag-over]="dragOver()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)">
           <input type="file" id="fileInput" accept=".pdf,.docx,.txt" (change)="onFileSelected($event)" hidden>
           <label for="fileInput" class="file-label">
-            <span class="icon">📄</span>
-            <span *ngIf="!selectedFile()">Clique para selecionar PDF, DOCX ou TXT (máx. 5MB)</span>
-            <span *ngIf="selectedFile()" class="file-name">{{ selectedFile()!.name }}</span>
+            <span class="icon">{{ dragOver() ? '📥' : (selectedFile() ? '✅' : '📄') }}</span>
+            <span *ngIf="dragOver()">Solte o arquivo aqui</span>
+            <span *ngIf="!dragOver() && !selectedFile()">Arraste e solte ou clique para selecionar<br><small>PDF, DOCX ou TXT · máx. 5MB</small></span>
+            <span *ngIf="!dragOver() && selectedFile()" class="file-name">{{ selectedFile()!.name }}</span>
           </label>
         </div>
       </div>

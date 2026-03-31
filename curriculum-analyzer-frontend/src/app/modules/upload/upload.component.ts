@@ -32,6 +32,7 @@ export class UploadComponent implements OnDestroy {
   selectedFile = signal<File | null>(null);
   errorMessage = signal('');
   currentStep = signal(0);
+  dragOver = signal(false);
   readonly steps = STEPS;
 
   private stepTimer?: Subscription;
@@ -72,13 +73,28 @@ export class UploadComponent implements OnDestroy {
   }
 
   onFileSelected(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    const files = target.files;
+    const files = (event.target as HTMLInputElement).files;
+    if (files?.length) this.validateAndSetFile(files[0]);
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver.set(true);
+  }
+
+  onDragLeave(): void {
+    this.dragOver.set(false);
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver.set(false);
+    const file = event.dataTransfer?.files[0];
+    if (file) this.validateAndSetFile(file);
+  }
+
+  private validateAndSetFile(file: File): void {
     this.errorMessage.set('');
-
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
     const validTypes = [
       'application/pdf',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

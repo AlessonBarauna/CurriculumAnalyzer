@@ -145,6 +145,12 @@
     border-color: #4299e1;
     background: #ebf8ff;
   }
+
+  &.drag-over {
+    border-color: #3182ce;
+    background: #bee3f8;
+    transform: scale(1.01);
+  }
 }
 
 .file-label {
