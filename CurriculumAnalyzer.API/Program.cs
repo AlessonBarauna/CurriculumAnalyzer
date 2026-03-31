@@ -25,10 +25,23 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader());
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Data Source=curriculum_analyzer.db";
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(connectionString));
+var databaseUrl = builder.Configuration["DATABASE_URL"]
+    ?? Environment.GetEnvironmentVariable("DATABASE_URL");
+
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    // Produção (Railway): PostgreSQL persistente
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(databaseUrl));
+}
+else
+{
+    // Desenvolvimento local: SQLite
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? "Data Source=curriculum_analyzer.db";
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlite(connectionString));
+}
 
 var rawJwtKey = builder.Configuration["Jwt:Key"];
 var jwtKey = (!string.IsNullOrWhiteSpace(rawJwtKey) && rawJwtKey != "CONFIGURE_VIA_ENV")
@@ -73,7 +86,12 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    var isPostgres = db.Database.ProviderName?.Contains("Npgsql") == true;
+
+    if (isPostgres)
+        db.Database.EnsureCreated(); // cria schema diretamente no PostgreSQL Railway
+    else
+        db.Database.Migrate();      // aplica migrations incrementais no SQLite local
 }
 
 app.Run();
