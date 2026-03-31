@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CurriculumService } from '../../shared/services/curriculum.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-upload',
@@ -36,7 +37,8 @@ export class UploadComponent {
   constructor(
     private fb: FormBuilder,
     private curriculumService: CurriculumService,
-    private router: Router
+    private router: Router,
+    public authService: AuthService
   ) {
     this.uploadForm = this.fb.group({
       experienceLevel: ['mid-level', Validators.required],
@@ -100,5 +102,10 @@ export class UploadComponent {
 
   goToHistory(): void {
     this.router.navigate(['/history']);
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }
