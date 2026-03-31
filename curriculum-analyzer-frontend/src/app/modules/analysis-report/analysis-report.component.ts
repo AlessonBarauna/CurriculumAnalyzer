@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AnalysisService } from '../../shared/services/analysis.service';
 import { CurriculumAnalysis, ActionItem } from '../../shared/models/analysis.model';
 
@@ -21,7 +21,6 @@ export class AnalysisReportComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private analysisService: AnalysisService
   ) {}
 
@@ -95,11 +94,4 @@ export class AnalysisReportComponent implements OnInit {
     return labels[type] ?? type;
   }
 
-  analyzeAnother(): void {
-    this.router.navigate(['/']);
-  }
-
-  goToHistory(): void {
-    this.router.navigate(['/history']);
-  }
 }

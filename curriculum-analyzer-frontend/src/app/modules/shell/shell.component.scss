@@ -1,0 +1,95 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+.navbar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: white;
+  flex-shrink: 0;
+
+  .brand-icon { font-size: 1.3rem; }
+  .brand-name {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.85);
+    strong { color: #63b3ed; font-weight: 700; }
+  }
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.25rem;
+  flex: 1;
+
+  a {
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    transition: all 0.2s;
+
+    &:hover { color: white; background: rgba(255,255,255,0.08); }
+    &.active { color: white; background: rgba(99,179,237,0.2); font-weight: 600; }
+  }
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.user-greeting {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.55);
+  white-space: nowrap;
+}
+
+.btn-logout {
+  padding: 0.35rem 0.9rem;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: #fc8181;
+    color: #fc8181;
+    background: rgba(252,129,129,0.08);
+  }
+}
+
+.shell-content {
+  min-height: calc(100vh - 60px);
+  background: #f7fafc;
+}
+
+@media (max-width: 600px) {
+  .navbar-inner { gap: 1rem; padding: 0 1rem; }
+  .user-greeting { display: none; }
+  .nav-links a { padding: 0.4rem 0.65rem; font-size: 0.8rem; }
+  .brand-name { display: none; }
+}

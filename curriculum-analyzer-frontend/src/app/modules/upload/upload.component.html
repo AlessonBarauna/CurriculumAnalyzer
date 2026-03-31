@@ -3,11 +3,6 @@
     <div class="header">
       <h1>🎯 Analisador de Currículo</h1>
       <p>Análise profissional com IA para profissionais de TI</p>
-      <div class="header-actions">
-        <span class="user-name">Olá, {{ authService.currentUser()?.name }}</span>
-        <button class="btn-history" (click)="goToHistory()">📋 Histórico</button>
-        <button class="btn-logout" (click)="logout()">Sair</button>
-      </div>
     </div>
 
     <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()" class="upload-form">

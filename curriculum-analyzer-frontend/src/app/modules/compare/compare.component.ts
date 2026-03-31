@@ -1,6 +1,5 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { AnalysisService } from '../../shared/services/analysis.service';
 import { AnalysisHistoryItem } from '../../shared/models/history.model';
 import { CompareResult, CompareSnapshot } from '../../shared/models/compare.model';
@@ -22,10 +21,7 @@ export class CompareComponent implements OnInit {
 
   canCompare = computed(() => this.selected().length === 2);
 
-  constructor(
-    private analysisService: AnalysisService,
-    private router: Router
-  ) {}
+  constructor(private analysisService: AnalysisService) {}
 
   ngOnInit(): void {
     this.analysisService.getHistory().subscribe({
@@ -101,7 +97,4 @@ export class CompareComponent implements OnInit {
     return this.history().filter(h => ids.includes(h.id));
   });
 
-  goBack(): void {
-    this.router.navigate(['/history']);
-  }
 }

@@ -11,25 +11,29 @@ export const routes: Routes = [
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./modules/upload/upload.component').then(m => m.UploadComponent)
-  },
-  {
-    path: 'history',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./modules/history/history.component').then(m => m.HistoryComponent)
-  },
-  {
-    path: 'analysis/:id',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./modules/analysis-report/analysis-report.component').then(m => m.AnalysisReportComponent)
-  },
-  {
-    path: 'compare',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./modules/compare/compare.component').then(m => m.CompareComponent)
+      import('./modules/shell/shell.component').then(m => m.ShellComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./modules/upload/upload.component').then(m => m.UploadComponent)
+      },
+      {
+        path: 'history',
+        loadComponent: () =>
+          import('./modules/history/history.component').then(m => m.HistoryComponent)
+      },
+      {
+        path: 'compare',
+        loadComponent: () =>
+          import('./modules/compare/compare.component').then(m => m.CompareComponent)
+      },
+      {
+        path: 'analysis/:id',
+        loadComponent: () =>
+          import('./modules/analysis-report/analysis-report.component').then(m => m.AnalysisReportComponent)
+      }
+    ]
   },
   { path: '**', redirectTo: '' }
 ];

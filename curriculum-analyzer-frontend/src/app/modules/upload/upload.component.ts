@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { interval, Subscription } from 'rxjs';
 import { CurriculumService } from '../../shared/services/curriculum.service';
-import { AuthService } from '../../shared/services/auth.service';
 
 interface ProgressStep {
   label: string;
@@ -56,8 +55,7 @@ export class UploadComponent implements OnDestroy {
   constructor(
     private fb: FormBuilder,
     private curriculumService: CurriculumService,
-    private router: Router,
-    public authService: AuthService
+    private router: Router
   ) {
     this.uploadForm = this.fb.group({
       experienceLevel: ['mid-level', Validators.required],
@@ -166,12 +164,4 @@ export class UploadComponent implements OnDestroy {
     this.stepTimer?.unsubscribe();
   }
 
-  goToHistory(): void {
-    this.router.navigate(['/history']);
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
 }

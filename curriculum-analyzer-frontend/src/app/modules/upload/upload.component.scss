@@ -1,10 +1,10 @@
 .upload-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: calc(100vh - 60px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  background: #f7fafc;
 }
 
 .upload-container {
@@ -29,48 +29,8 @@
 
   p {
     color: #666;
-    margin: 0 0 0.75rem;
+    margin: 0;
   }
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
-}
-
-.user-name {
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.btn-history {
-  background: transparent;
-  border: 1px solid #4299e1;
-  color: #4299e1;
-  padding: 0.4rem 1rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover { background: #ebf8ff; }
-}
-
-.btn-logout {
-  background: transparent;
-  border: 1px solid #e53e3e;
-  color: #e53e3e;
-  padding: 0.4rem 1rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover { background: #fff5f5; }
 }
 
 .progress-steps {
