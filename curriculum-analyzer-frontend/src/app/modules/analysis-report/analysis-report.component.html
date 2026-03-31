@@ -7,7 +7,7 @@
 
 <div *ngIf="errorMessage()" class="error-page">
   <p>{{ errorMessage() }}</p>
-  <button (click)="analyzeAnother()">Voltar</button>
+  <a routerLink="/" class="btn-back-link">← Voltar</a>
 </div>
 
 <div *ngIf="!loading() && !errorMessage() && analysis()" class="report-page">
@@ -15,14 +15,34 @@
   <!-- HEADER -->
   <div class="report-header">
     <div class="header-content">
-      <h1>📊 Análise de Currículo</h1>
-      <div class="score-badge" [style.background]="getScoreColor(analysis()!.overallScore)">
-        <span class="score-number">{{ analysis()!.overallScore }}</span>
-        <span class="score-max">/100</span>
-        <span class="score-label">{{ getScoreLabel(analysis()!.overallScore) }}</span>
+      <div class="header-text">
+        <h1>📊 Análise de Currículo</h1>
+        <p class="score-explanation">{{ analysis()!.scoreExplanation }}</p>
+      </div>
+
+      <div class="score-donut">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="52" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="10"/>
+          <circle
+            cx="65" cy="65" r="52"
+            fill="none"
+            [attr.stroke]="getScoreColor(analysis()!.overallScore)"
+            stroke-width="10"
+            stroke-linecap="round"
+            [attr.stroke-dasharray]="circumference"
+            [attr.stroke-dashoffset]="scoreOffset()"
+            class="arc"
+            transform="rotate(-90 65 65)"/>
+        </svg>
+        <div class="donut-center">
+          <span class="donut-score">{{ analysis()!.overallScore }}</span>
+          <span class="donut-max">/100</span>
+          <span class="donut-label" [style.color]="getScoreColor(analysis()!.overallScore)">
+            {{ getScoreLabel(analysis()!.overallScore) }}
+          </span>
+        </div>
       </div>
     </div>
-    <p class="score-explanation">{{ analysis()!.scoreExplanation }}</p>
   </div>
 
   <!-- TABS -->

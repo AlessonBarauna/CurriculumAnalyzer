@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { AnalysisService } from '../../shared/services/analysis.service';
 import { CurriculumAnalysis, ActionItem } from '../../shared/models/analysis.model';
 
@@ -9,7 +9,7 @@ type Tab = 'overview' | 'strengths' | 'weaknesses' | 'plan' | 'jobs';
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './analysis-report.component.html',
   styleUrls: ['./analysis-report.component.scss']
 })
@@ -18,6 +18,9 @@ export class AnalysisReportComponent implements OnInit {
   loading = signal(true);
   errorMessage = signal('');
   activeTab = signal<Tab>('overview');
+
+  readonly circumference = 2 * Math.PI * 52;
+  scoreOffset = signal(2 * Math.PI * 52);
 
   constructor(
     private route: ActivatedRoute,
@@ -37,6 +40,9 @@ export class AnalysisReportComponent implements OnInit {
       next: (data) => {
         this.analysis.set(data);
         this.loading.set(false);
+        setTimeout(() => {
+          this.scoreOffset.set(this.circumference * (1 - data.overallScore / 100));
+        }, 60);
       },
       error: (err) => {
         this.errorMessage.set(`Erro: ${err?.status ?? ''} ${err?.message ?? ''}`);
