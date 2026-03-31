@@ -12,3 +12,10 @@ public record LoginRequest(
     [Required] string Password);
 
 public record AuthResponse(string Token, string Name, string Email);
+
+public record UpdateProfileRequest(
+    [Required][MinLength(2)] string Name);
+
+public record ChangePasswordRequest(
+    [Required] string CurrentPassword,
+    [Required][MinLength(6)] string NewPassword);

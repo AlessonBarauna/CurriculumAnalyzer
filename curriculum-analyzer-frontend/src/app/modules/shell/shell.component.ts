@@ -15,6 +15,10 @@ import { ConfirmModalComponent } from '../../shared/components/confirm-modal/con
 export class ShellComponent {
   constructor(public authService: AuthService, private router: Router) {}
 
+  get currentUserFirstName(): string {
+    return this.authService.currentUser()?.name?.split(' ')[0] ?? 'Usuário';
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

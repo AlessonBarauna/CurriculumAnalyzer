@@ -4,7 +4,6 @@
       <span class="brand-icon">🎯</span>
       <span class="brand-name">CV<strong>Analyzer</strong></span>
     </a>
-
     <div class="nav-links">
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         Nova Análise
@@ -12,17 +11,14 @@
       <a routerLink="/history" routerLinkActive="active">Histórico</a>
       <a routerLink="/compare" routerLinkActive="active">Comparar</a>
     </div>
-
     <div class="nav-user">
-      <span class="user-greeting">Olá, {{ authService.currentUser()?.name?.split(' ')[0] }}</span>
+      <span class="user-greeting">Olá, {{ currentUserFirstName }}</span>
       <button class="btn-logout" (click)="logout()">Sair</button>
     </div>
   </div>
 </nav>
-
 <main class="shell-content">
   <router-outlet></router-outlet>
 </main>
-
 <app-toast></app-toast>
 <app-confirm-modal></app-confirm-modal>

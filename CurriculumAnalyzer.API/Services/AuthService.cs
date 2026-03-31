@@ -68,6 +68,29 @@ public class AuthService(AppDbContext dbContext, IConfiguration configuration) :
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    public async Task<AuthResponse> UpdateProfileAsync(string userId, UpdateProfileRequest request)
+    {
+        var user = await dbContext.Users.FindAsync(userId)
+            ?? throw new NotFoundException("Usuário não encontrado.");
+
+        user.Name = request.Name.Trim();
+        await dbContext.SaveChangesAsync();
+
+        return new AuthResponse(GenerateToken(user), user.Name, user.Email);
+    }
+
+    public async Task ChangePasswordAsync(string userId, ChangePasswordRequest request)
+    {
+        var user = await dbContext.Users.FindAsync(userId)
+            ?? throw new NotFoundException("Usuário não encontrado.");
+
+        if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
+            throw new ValidationException("Senha atual incorreta.");
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        await dbContext.SaveChangesAsync();
+    }
+
     // Chave única usada tanto para assinar (aqui) quanto para validar (Program.cs).
     // Fallback de desenvolvimento garante mínimo de 32 bytes exigido pelo HS256.
     private string ResolveJwtKey()

@@ -34,6 +34,14 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, { name, email, password });
   }
 
+  updateProfile(name: string): Observable<AuthResponse> {
+    return this.http.put<AuthResponse>(`${this.apiUrl}/auth/profile`, { name });
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/auth/password`, { currentPassword, newPassword });
+  }
+
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
