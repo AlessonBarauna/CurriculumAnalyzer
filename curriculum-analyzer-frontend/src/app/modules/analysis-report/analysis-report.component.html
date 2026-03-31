@@ -67,17 +67,26 @@
         </p>
       </div>
 
-      <h3 class="section-title">Scores por Seção</h3>
-      <div class="section-scores">
-        <div class="section-row" *ngFor="let section of getSectionEntries()">
-          <span class="section-name">{{ getSectionLabel(section.key) }}</span>
-          <div class="progress-bar">
-            <div class="progress-fill"
-              [style.width.%]="section.value.score"
-              [style.background]="getScoreColor(section.value.score)">
+      <div class="overview-grid">
+        <div class="overview-radar">
+          <h3 class="section-title">Visão Radar</h3>
+          <app-radar-chart [sections]="analysis()!.sections"></app-radar-chart>
+        </div>
+
+        <div class="overview-bars">
+          <h3 class="section-title">Scores por Seção</h3>
+          <div class="section-scores">
+            <div class="section-row" *ngFor="let section of getSectionEntries()">
+              <span class="section-name">{{ getSectionLabel(section.key) }}</span>
+              <div class="progress-bar">
+                <div class="progress-fill"
+                  [style.width.%]="section.value.score"
+                  [style.background]="getScoreColor(section.value.score)">
+                </div>
+              </div>
+              <span class="section-score">{{ section.value.score }}/100</span>
             </div>
           </div>
-          <span class="section-score">{{ section.value.score }}/100</span>
         </div>
       </div>
     </div>

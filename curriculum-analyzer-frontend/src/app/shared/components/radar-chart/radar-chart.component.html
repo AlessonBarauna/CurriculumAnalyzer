@@ -1,0 +1,48 @@
+<svg class="radar-svg" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- grid circles -->
+  <polygon
+    *ngFor="let pts of gridPolygons()"
+    [attr.points]="pts"
+    class="grid-poly"/>
+
+  <!-- axis lines -->
+  <line
+    *ngFor="let ax of axes()"
+    [attr.x1]="160" [attr.y1]="150"
+    [attr.x2]="ax.tip.x" [attr.y2]="ax.tip.y"
+    class="axis-line"/>
+
+  <!-- data polygon -->
+  <polygon
+    [attr.points]="toSvgPoints(dataPolygon())"
+    class="data-poly"/>
+
+  <!-- data points -->
+  <circle
+    *ngFor="let pt of dataPolygon()"
+    [attr.cx]="pt.x" [attr.cy]="pt.y"
+    r="4"
+    class="data-dot"/>
+
+  <!-- labels -->
+  <text
+    *ngFor="let ax of axes()"
+    [attr.x]="ax.label_pos.x"
+    [attr.y]="ax.label_pos.y"
+    [attr.text-anchor]="ax.label_pos.anchor"
+    class="axis-label">
+    {{ ax.label }}
+  </text>
+
+  <!-- score badges on dots -->
+  <text
+    *ngFor="let ax of axes()"
+    [attr.x]="ax.tip.x"
+    [attr.y]="ax.tip.y - 10"
+    text-anchor="middle"
+    class="score-label">
+    {{ ax.score }}
+  </text>
+
+</svg>

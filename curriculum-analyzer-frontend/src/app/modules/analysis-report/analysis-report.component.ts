@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { AnalysisService } from '../../shared/services/analysis.service';
+import { RadarChartComponent } from '../../shared/components/radar-chart/radar-chart.component';
 import { CurriculumAnalysis, ActionItem } from '../../shared/models/analysis.model';
 
 type Tab = 'overview' | 'strengths' | 'weaknesses' | 'plan' | 'jobs';
@@ -9,7 +10,7 @@ type Tab = 'overview' | 'strengths' | 'weaknesses' | 'plan' | 'jobs';
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, RadarChartComponent],
   templateUrl: './analysis-report.component.html',
   styleUrls: ['./analysis-report.component.scss']
 })

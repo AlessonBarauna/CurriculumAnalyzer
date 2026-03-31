@@ -1,0 +1,49 @@
+.radar-svg {
+  width: 100%;
+  max-width: 360px;
+  display: block;
+  margin: 0 auto;
+}
+
+.grid-poly {
+  fill: none;
+  stroke: #e2e8f0;
+  stroke-width: 1;
+}
+
+.axis-line {
+  stroke: #e2e8f0;
+  stroke-width: 1;
+}
+
+.data-poly {
+  fill: rgba(66, 153, 225, 0.2);
+  stroke: #4299e1;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  animation: radar-fill 0.8s ease forwards;
+}
+
+.data-dot {
+  fill: #4299e1;
+  stroke: white;
+  stroke-width: 2;
+}
+
+.axis-label {
+  font-size: 11px;
+  fill: #4a5568;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.score-label {
+  font-size: 10px;
+  fill: #718096;
+  font-family: inherit;
+}
+
+@keyframes radar-fill {
+  from { opacity: 0; transform: scale(0.5); transform-origin: 160px 150px; }
+  to   { opacity: 1; transform: scale(1);   transform-origin: 160px 150px; }
+}
