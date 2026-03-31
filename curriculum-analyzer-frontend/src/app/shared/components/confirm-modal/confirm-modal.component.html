@@ -1,0 +1,10 @@
+<div *ngIf="visible()" class="modal-backdrop" (click)="cancel()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🗑️</div>
+    <p class="modal-message">{{ message() }}</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancel()">Cancelar</button>
+      <button class="btn-confirm" (click)="confirm()">Excluir</button>
+    </div>
+  </div>
+</div>

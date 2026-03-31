@@ -1,18 +1,22 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AnalysisService } from '../../shared/services/analysis.service';
 import { AnalysisHistoryItem } from '../../shared/models/history.model';
+import { ToastService } from '../../shared/services/toast.service';
+import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmModalComponent],
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.scss']
 })
 export class HistoryComponent implements OnInit {
+  confirmModal = viewChild.required(ConfirmModalComponent);
+
   history = signal<AnalysisHistoryItem[]>([]);
   loading = signal(true);
   errorMessage = signal('');
@@ -37,7 +41,8 @@ export class HistoryComponent implements OnInit {
 
   constructor(
     private analysisService: AnalysisService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -57,19 +62,21 @@ export class HistoryComponent implements OnInit {
     this.router.navigate(['/analysis', id]);
   }
 
-  confirmDelete(event: Event, id: string): void {
+  async confirmDelete(event: Event, id: string): Promise<void> {
     event.stopPropagation();
-    if (!confirm('Excluir esta análise? Esta ação não pode ser desfeita.')) return;
+    const confirmed = await this.confirmModal().open('Excluir esta análise? Esta ação não pode ser desfeita.');
+    if (!confirmed) return;
 
     this.deletingId.set(id);
     this.analysisService.deleteAnalysis(id).subscribe({
       next: () => {
         this.history.update(list => list.filter(item => item.id !== id));
         this.deletingId.set(null);
+        this.toast.success('Análise excluída com sucesso.');
       },
       error: () => {
         this.deletingId.set(null);
-        alert('Erro ao excluir análise. Tente novamente.');
+        this.toast.error('Erro ao excluir análise. Tente novamente.');
       }
     });
   }

@@ -2,11 +2,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
+import { ToastComponent } from '../../shared/components/toast/toast.component';
+import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ToastComponent, ConfirmModalComponent],
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss']
 })

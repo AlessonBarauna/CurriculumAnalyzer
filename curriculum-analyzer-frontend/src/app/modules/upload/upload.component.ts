@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { interval, Subscription } from 'rxjs';
 import { CurriculumService } from '../../shared/services/curriculum.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 interface ProgressStep {
   label: string;
@@ -55,7 +56,8 @@ export class UploadComponent implements OnDestroy {
   constructor(
     private fb: FormBuilder,
     private curriculumService: CurriculumService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {
     this.uploadForm = this.fb.group({
       experienceLevel: ['mid-level', Validators.required],
@@ -134,13 +136,14 @@ export class UploadComponent implements OnDestroy {
         this.loading.set(false);
         this.router.navigate(['/analysis', result.analysisId]).then(navigated => {
           if (!navigated) {
-            this.errorMessage.set('Análise concluída! Acesse o histórico para visualizá-la.');
+            this.toast.info('Análise concluída! Acesse o histórico para visualizá-la.');
             this.currentStep.set(0);
           }
         });
       },
       error: (err) => {
         this.stopStepTimer();
+        this.toast.error(err?.error?.error || 'Erro ao processar arquivo. Tente novamente.');
         this.errorMessage.set(err?.error?.error || 'Erro ao processar arquivo. Tente novamente.');
         this.loading.set(false);
         this.currentStep.set(0);
