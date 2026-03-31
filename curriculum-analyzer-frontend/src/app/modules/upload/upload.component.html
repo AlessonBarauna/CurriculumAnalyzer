@@ -62,11 +62,25 @@
         ⚠️ {{ errorMessage() }}
       </div>
 
+      <!-- Progresso durante análise -->
+      <div *ngIf="loading()" class="progress-steps">
+        <div
+          *ngFor="let step of steps; let i = index"
+          class="step"
+          [class.active]="i === currentStep()"
+          [class.done]="i < currentStep()">
+          <div class="step-icon">
+            <span *ngIf="i < currentStep()">✅</span>
+            <span *ngIf="i === currentStep()" class="spinner-small"></span>
+            <span *ngIf="i > currentStep()">{{ step.icon }}</span>
+          </div>
+          <span class="step-label">{{ step.label }}</span>
+        </div>
+      </div>
+
       <button type="submit" class="btn-analyze" [disabled]="loading() || !selectedFile()">
         <span *ngIf="!loading()">🚀 Analisar Currículo</span>
-        <span *ngIf="loading()" class="loading-text">
-          <span class="spinner"></span> Analisando com IA...
-        </span>
+        <span *ngIf="loading()">Processando...</span>
       </button>
     </form>
   </div>
