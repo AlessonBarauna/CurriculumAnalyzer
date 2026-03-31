@@ -30,7 +30,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
 
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "dev-only-key-change-in-production-32c";
+var rawJwtKey = builder.Configuration["Jwt:Key"];
+var jwtKey = (!string.IsNullOrWhiteSpace(rawJwtKey) && rawJwtKey != "CONFIGURE_VIA_ENV")
+    ? rawJwtKey
+    : "dev-only-key-change-in-production-32c";
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

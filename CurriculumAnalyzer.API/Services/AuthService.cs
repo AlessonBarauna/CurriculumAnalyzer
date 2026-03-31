@@ -44,9 +44,7 @@ public class AuthService(AppDbContext dbContext, IConfiguration configuration) :
 
     private string GenerateToken(UserEntity user)
     {
-        var key = configuration["Jwt:Key"]
-            ?? throw new InvalidOperationException("JWT key not configured.");
-
+        var key = ResolveJwtKey();
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -68,5 +66,15 @@ public class AuthService(AppDbContext dbContext, IConfiguration configuration) :
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    // Chave única usada tanto para assinar (aqui) quanto para validar (Program.cs).
+    // Fallback de desenvolvimento garante mínimo de 32 bytes exigido pelo HS256.
+    private string ResolveJwtKey()
+    {
+        var configured = configuration["Jwt:Key"];
+        if (!string.IsNullOrWhiteSpace(configured) && configured != "CONFIGURE_VIA_ENV")
+            return configured;
+        return "dev-only-key-change-in-production-32c";
     }
 }
