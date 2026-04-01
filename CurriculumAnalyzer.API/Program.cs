@@ -25,34 +25,38 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader());
 });
 
+string BuildConnectionString(string databaseUrl)
+{
+    var uri = new Uri(databaseUrl);
+
+    var userInfo = uri.UserInfo.Split(':');
+    var username = userInfo[0];
+    var password = userInfo[1];
+
+    return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+}
+
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
 Console.WriteLine($"DATABASE_URL: {databaseUrl}");
 
-if (string.IsNullOrEmpty(databaseUrl))
-{
-    throw new Exception("DATABASE_URL não configurado.");
-}
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(databaseUrl));
-    Console.WriteLine($"DATABASE_URL: {databaseUrl}");
+string connectionString;
 
 if (!string.IsNullOrEmpty(databaseUrl))
 {
-    // Produção (Railway): PostgreSQL persistente
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(databaseUrl));
+    Console.WriteLine("🔥 Usando PostgreSQL do Railway");
+
+    connectionString = BuildConnectionString(databaseUrl);
 }
 else
 {
-    // Desenvolvimento local: SQLite
-    var connectionString = builder.Configuration.GetConnectionString("PostgresLocal")
-        ?? "Host=localhost;Port=5432;Database=curriculum_analyzer;Username=postgres;Password=postgres";
+    Console.WriteLine("⚠️ Usando PostgreSQL local");
 
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(connectionString));
+    connectionString = "Host=localhost;Port=5432;Database=curriculum_analyzer;Username=postgres;Password=postgres";
 }
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 var rawJwtKey = builder.Configuration["Jwt:Key"];
 var jwtKey = (!string.IsNullOrWhiteSpace(rawJwtKey) && rawJwtKey != "CONFIGURE_VIA_ENV")
