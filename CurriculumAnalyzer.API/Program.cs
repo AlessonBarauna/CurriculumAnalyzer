@@ -101,7 +101,10 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (app.Environment.IsDevelopment())
+{
     db.Database.Migrate();
+}
 }
 
 app.Run();
