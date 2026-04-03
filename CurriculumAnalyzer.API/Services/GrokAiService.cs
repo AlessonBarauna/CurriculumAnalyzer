@@ -21,6 +21,12 @@ public class GrokAiService : IGrokAiService
         _logger = logger;
     }
 
+    private const string SystemMessage =
+        "Você é um especialista sênior em recrutamento tech no mercado brasileiro, com 15 anos de experiência " +
+        "avaliando currículos para empresas como Nubank, iFood, Mercado Livre, TOTVS e startups de alto crescimento. " +
+        "Sua análise é direta, honesta e específica — você nunca dá feedback genérico nem elogios vazios. " +
+        "Você sabe que um feedback que não aponta problemas reais não ajuda o candidato a crescer.";
+
     public async Task<AnalysisResponseDto> AnalyzeCurriculumAsync(string curriculumText, UserContextModel userContext)
     {
         var apiKey = _configuration["Groq:ApiKey"];
@@ -28,88 +34,150 @@ public class GrokAiService : IGrokAiService
             throw new GrokApiException("Groq API key não configurada. Defina Groq:ApiKey no appsettings.");
 
         var prompt = BuildAnalysisPrompt(curriculumText, userContext);
+        return await CallWithFallbackAsync(prompt, apiKey);
+    }
 
+    private string BuildAnalysisPrompt(string curriculumText, UserContextModel userContext)
+    {
+        return $@"CURRÍCULO A ANALISAR:
+---
+{curriculumText}
+---
+
+PERFIL DO CANDIDATO:
+- Nível: {userContext.ExperienceLevel}
+- Especialidade: {userContext.Specialization}
+- Objetivo: {userContext.MarketObjective}
+- Localização: {userContext.CurrentLocation}
+{(userContext.TargetSalary.HasValue ? $"- Pretensão salarial: R$ {userContext.TargetSalary}" : "")}
+
+CALIBRAÇÃO DE SCORES (aplique com rigor):
+- 90-100: Excepcional, raridade no mercado
+- 75-89: Forte, acima da média dos candidatos
+- 60-74: Adequado, cumpre requisitos básicos
+- 40-59: Abaixo do esperado para o nível
+- 0-39: Crítico, compromete a candidatura
+
+CONTEXTO DO MERCADO BRASILEIRO DE TI (2025-2026):
+- Tecnologias muito demandadas: TypeScript, React, Node.js, Python, Go, Kotlin, .NET, AWS, Docker, Kubernetes, SQL
+- Salários CLT — Junior: R$3k-6k | Mid: R$7k-12k | Senior: R$12k-22k
+- Salários PJ — Junior: R$4.5k-8k | Mid: R$10k-16k | Senior: R$18k-35k | Especialista: R$25k-45k+
+
+REGRAS OBRIGATÓRIAS:
+1. Cite trechos REAIS do currículo ao justificar fraquezas — nunca generalize
+2. Em ""example.bad"" use texto real do currículo; em ""example.good"" reescreva com melhoria concreta
+3. O overallScore deve ser a média ponderada das seções (experiência tem peso 2x)
+4. solutionSteps devem ser ações concretas e ordenadas, não conselhos genéricos
+5. estimatedSalaryRange deve refletir o nível e localização informados, não inventar valores
+
+RETORNE APENAS JSON VÁLIDO (sem markdown, sem texto fora do JSON):
+{{
+  ""overallScore"": <número 0-100>,
+  ""scoreExplanation"": ""<2-3 frases explicando o score, mencionando pontos fortes e críticos>"",
+  ""sections"": {{
+    ""structure"": {{""score"": <0-100>, ""feedback"": ""<feedback específico sobre layout, organização, extensão>""}},
+    ""contact"": {{""score"": <0-100>, ""feedback"": ""<LinkedIn, GitHub, email, telefone — o que falta ou está errado>""}},
+    ""summary"": {{""score"": <0-100>, ""feedback"": ""<avalie se existe, se é objetivo, se comunica proposta de valor>""}},
+    ""experience"": {{""score"": <0-100>, ""feedback"": ""<avalie resultados mensuráveis, verbos de ação, relevância para o nível>""}},
+    ""skills"": {{""score"": <0-100>, ""feedback"": ""<avalie organização, relevância das tecnologias para o objetivo>""}},
+    ""education"": {{""score"": <0-100>, ""feedback"": ""<graduação, certificações, cursos — adequação ao nível pretendido>""}},
+    ""projects"": {{""score"": <0-100>, ""feedback"": ""<projetos pessoais, links, impacto — ou ausência deles>""}}
+  }},
+  ""strengths"": [
+    {{""title"": ""..."", ""description"": ""..."", ""impact"": ""..."", ""priority"": ""high""}}
+  ],
+  ""weaknesses"": [
+    {{""title"": ""..."", ""description"": ""..."", ""impact"": ""..."", ""priority"": ""critical"", ""example"": {{""bad"": ""<trecho real>"", ""good"": ""<versão melhorada>""}}, ""solutionSteps"": [""passo concreto 1"", ""passo concreto 2""]}}
+  ],
+  ""opportunities"": [
+    {{""title"": ""..."", ""description"": ""..."", ""timelineWeeks"": <número>, ""estimatedSalaryImpact"": <número em BRL>, ""difficulty"": ""low|medium|high""}}
+  ],
+  ""actionPlan"": [
+    {{""timeline"": ""short-term|mid-term|long-term"", ""priority"": ""urgent|high|medium"", ""title"": ""..."", ""description"": ""..."", ""estimatedDuration"": ""..."", ""checklist"": [""item 1"", ""item 2""]}}
+  ],
+  ""jobRecommendations"": [
+    {{""type"": ""startup|enterprise|consultoria|remoto-internacional"", ""fit"": ""strong|moderate|weak"", ""strengths"": [""...""], ""improvements"": [""...""], ""preparationTips"": [""...""]}}
+  ],
+  ""estimatedSalaryRange"": {{""min"": <número>, ""max"": <número>, ""currency"": ""BRL""}}
+}}";
+    }
+
+    private async Task<AnalysisResponseDto> CallWithFallbackAsync(string prompt, string apiKey)
+    {
+        const string primaryModel = "llama-3.3-70b-versatile";
+        const string fallbackModel = "llama-3.1-8b-instant";
+
+        try
+        {
+            return await CallWithRetryAsync(primaryModel, prompt, apiKey);
+        }
+        catch (GrokApiException ex)
+        {
+            _logger.LogWarning("Modelo primário {Model} falhou: {Message}. Tentando fallback {Fallback}...",
+                primaryModel, ex.Message, fallbackModel);
+
+            return await CallWithRetryAsync(fallbackModel, prompt, apiKey);
+        }
+    }
+
+    private async Task<AnalysisResponseDto> CallWithRetryAsync(string model, string prompt, string apiKey, int maxRetries = 2)
+    {
+        for (int attempt = 0; attempt < maxRetries; attempt++)
+        {
+            try
+            {
+                var content = await SendRequestAsync(model, prompt, apiKey);
+                return ParseGrokResponse(content);
+            }
+            catch (GrokApiException ex)
+            {
+                var delay = TimeSpan.FromSeconds(Math.Pow(2, attempt + 1)); // 2s, 4s
+                _logger.LogWarning("Tentativa {Attempt}/{Max} falhou para {Model}: {Message}. Aguardando {Delay}s...",
+                    attempt + 1, maxRetries, model, ex.Message, delay.TotalSeconds);
+                await Task.Delay(delay);
+            }
+        }
+
+        // última tentativa — deixa a exceção propagar
+        var lastContent = await SendRequestAsync(model, prompt, apiKey);
+        return ParseGrokResponse(lastContent);
+    }
+
+    private async Task<string> SendRequestAsync(string model, string prompt, string apiKey)
+    {
         var requestBody = new
         {
-            model = "llama-3.3-70b-versatile",
-            messages = new[] { new { role = "user", content = prompt } },
-            temperature = 0.7,
-            max_tokens = 4000
+            model,
+            messages = new[]
+            {
+                new { role = "system", content = SystemMessage },
+                new { role = "user",   content = prompt }
+            },
+            temperature = 0.3,
+            max_tokens = 6000
         };
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, GroqApiUrl)
+        var request = new HttpRequestMessage(HttpMethod.Post, GroqApiUrl)
         {
             Content = JsonContent.Create(requestBody)
         };
-        requestMessage.Headers.Authorization =
+        request.Headers.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
 
-        var response = await _httpClient.SendAsync(requestMessage);
+        var response = await _httpClient.SendAsync(request);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogError("Grok API error {Status}: {Body}", response.StatusCode, responseContent);
+            _logger.LogError("Groq API erro {Status} [{Model}]: {Body}", response.StatusCode, model, responseContent);
             throw new GrokApiException($"Groq retornou erro {(int)response.StatusCode}. Tente novamente.");
         }
 
         var grokResponse = JsonSerializer.Deserialize<GrokApiResponse>(responseContent,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        var content = grokResponse?.Choices?[0]?.Message?.Content
+        return grokResponse?.Choices?[0]?.Message?.Content
             ?? throw new GrokApiException("Resposta vazia recebida da API Groq.");
-
-        return ParseGrokResponse(content);
-    }
-
-    private string BuildAnalysisPrompt(string curriculumText, UserContextModel userContext)
-    {
-        return $@"Você é um especialista em análise de currículos para a área de Tecnologia da Informação.
-
-CURRÍCULO A ANALISAR:
----
-{curriculumText}
----
-
-CONTEXTO DO CANDIDATO:
-- Nível desejado: {userContext.ExperienceLevel}
-- Especialidade: {userContext.Specialization}
-- Objetivo no mercado: {userContext.MarketObjective}
-- Localização: {userContext.CurrentLocation}
-{(userContext.TargetSalary.HasValue ? $"- Salário pretendido: R$ {userContext.TargetSalary}" : "")}
-
-Faça uma análise profunda do currículo. Avalie estrutura, contato, resumo, experiência, habilidades, educação e projetos.
-
-RETORNE APENAS UM JSON VÁLIDO (sem markdown, sem texto antes ou depois):
-{{
-  ""overallScore"": 75,
-  ""scoreExplanation"": ""explicação do score aqui"",
-  ""sections"": {{
-    ""structure"": {{""score"": 80, ""feedback"": ""...""}},
-    ""contact"": {{""score"": 90, ""feedback"": ""...""}},
-    ""summary"": {{""score"": 70, ""feedback"": ""...""}},
-    ""experience"": {{""score"": 75, ""feedback"": ""...""}},
-    ""skills"": {{""score"": 80, ""feedback"": ""...""}},
-    ""education"": {{""score"": 70, ""feedback"": ""...""}},
-    ""projects"": {{""score"": 65, ""feedback"": ""...""}}
-  }},
-  ""strengths"": [
-    {{""title"": ""..."", ""description"": ""..."", ""impact"": ""..."", ""priority"": ""high""}}
-  ],
-  ""weaknesses"": [
-    {{""title"": ""..."", ""description"": ""..."", ""impact"": ""..."", ""priority"": ""critical"", ""example"": {{""bad"": ""..."", ""good"": ""...""}}, ""solutionSteps"": [""passo 1"", ""passo 2""]}}
-  ],
-  ""opportunities"": [
-    {{""title"": ""..."", ""description"": ""..."", ""timelineWeeks"": 4, ""estimatedSalaryImpact"": 2000, ""difficulty"": ""medium""}}
-  ],
-  ""actionPlan"": [
-    {{""timeline"": ""short-term"", ""priority"": ""urgent"", ""title"": ""..."", ""description"": ""..."", ""estimatedDuration"": ""2 semanas"", ""checklist"": [""item 1"", ""item 2""]}}
-  ],
-  ""jobRecommendations"": [
-    {{""type"": ""startup"", ""fit"": ""strong"", ""strengths"": [""...""], ""improvements"": [""...""], ""preparationTips"": [""...""]}}
-  ],
-  ""estimatedSalaryRange"": {{""min"": 5000, ""max"": 8000, ""currency"": ""BRL""}}
-}}";
     }
 
     private AnalysisResponseDto ParseGrokResponse(string responseText)
